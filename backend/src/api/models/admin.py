@@ -1,4 +1,5 @@
 from ..utils import db
+from .contest import ContestSchema
 
 # Database and Schema Modeling
 from marshmallow_sqlalchemy import ModelSchema
@@ -15,6 +16,7 @@ class Admin(db.Model):
     last_name = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), nullable=False, unique=True)
     password = db.Column(db.String(255), nullable=False)
+    contests = db.relationship("Contest", backref="Admin", cascade="all, delete-orphan")
 
     def create(self):
         """
@@ -67,3 +69,8 @@ class AdminSchema(ModelSchema):
     last_name = fields.String(required=True)
     email = fields.Email(required=True)
     password = fields.String(load_only=True, required=True)
+    contests = fields.Nested(
+        ContestSchema,
+        many=True,
+        only=["name", "prize", ""]
+    )
