@@ -1,0 +1,16 @@
+flask
+flask-sqlalchemy
+flask-marshmallow
+marshmallow_sqlalchemy
+psycopg2
+python-dotenv
+marshmallow
+marshmallow-enum
+flask-jwt-extended
+Flask-Mail
+werkzeug
+flask-restful
+flask-bcrypt
+flask-cors
+wheel
+gunicorn
