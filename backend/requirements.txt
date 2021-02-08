@@ -14,3 +14,4 @@ flask-bcrypt
 flask-cors
 wheel
 gunicorn
+celery[redis]
