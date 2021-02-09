@@ -18,7 +18,8 @@ import os, sys
 import logging
 
 # Resources
-from src.api.views import SignUp, Admin
+from src.api.views import SignUp, Admin, Contest,ContestDetail
+
 
 logging.basicConfig(
     stream=sys.stdout,
@@ -47,3 +48,5 @@ with app.app_context():
 
 api.add_resource(SignUp, "/api/signup")
 api.add_resource(Admin, "/api/admin")
+api.add_resource(Contest, "/api/contest")
+api.add_resource(ContestDetail, "/api/contest/<url>")
