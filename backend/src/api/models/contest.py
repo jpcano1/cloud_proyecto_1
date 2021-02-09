@@ -12,7 +12,7 @@ class Contest(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(120), nullable=False)
     banner = db.Column(db.String(20), default="")
-    url = db.Column(db.String(50), nullable=False)
+    url = db.Column(db.String(50), nullable=False, unique=True)
     begin_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
     prize = db.Column(db.Float, nullable=False)
