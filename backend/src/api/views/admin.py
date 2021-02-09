@@ -4,6 +4,8 @@ from ..utils import db, responses, response_with
 from ..models import Admin as AdminModel
 from ..models import AdminSchema
 from sqlalchemy.exc import IntegrityError
+from datetime import timedelta
+from flask_jwt_extended import create_access_token
 
 class SignUp(Resource):
     def post(self):
@@ -36,6 +38,35 @@ class SignUp(Resource):
             })
         return response_with(responses.SUCCESS_200, value={
             "message": "Admin created"
+        })
+
+class Login(Resource):
+    def post(self):
+        """
+        Submits an admin info to login
+        :return: The logged on admin user.
+        """
+        data = request.get_json()
+        current_user = AdminModel.find_by_email(data["email"])
+
+        if not current_user:
+            return response_with(responses.INVALID_FIELD_NAME_SENT_422, value={
+                "error_message": "Wrong email or password"
+            })
+        verification = AdminModel.verify_hash(current_user.password,
+                                              data["password"])
+        if not verification:
+            return response_with(responses.INVALID_FIELD_NAME_SENT_422, value={
+                "error_message": "Wrong email or password"
+            })
+        expires = timedelta(hours=2)
+        access_token = create_access_token(
+            identity=str(current_user.id),
+            expires_delta=expires
+        )
+        return response_with(responses.SUCCESS_200, value={
+            "access_token": access_token,
+            "message": f"Logged in as {current_user.name}"
         })
 
 class Admin(Resource):
