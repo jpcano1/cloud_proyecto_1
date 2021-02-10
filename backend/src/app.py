@@ -19,7 +19,10 @@ import logging
 
 # Resources
 from src.api.views import (SignUp, Admin, Contest,
-                           ContestDetail, Voice)
+                           ContestDetail, Voice, VoiceDetail)
+
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv())
 
 logging.basicConfig(
     stream=sys.stdout,
@@ -56,3 +59,4 @@ api.add_resource(ContestDetail, "/api/contest/<url>")
 
 # Voice Routes
 api.add_resource(Voice, "/api/voice")
+api.add_resource(VoiceDetail, "/api/voice/<voice_id>")

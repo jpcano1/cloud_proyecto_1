@@ -2,7 +2,7 @@ from ..utils import db
 from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
 
-from ..models import VoiceSchema
+from .voice import VoiceSchema
 
 class Contest(db.Model):
     __tablename__ = "contests"

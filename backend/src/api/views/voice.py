@@ -24,4 +24,34 @@ class Voice(Resource):
         })
 
 class VoiceDetail(Resource):
-    pass
+    def get(self, voice_id):
+        fetched = VoiceModel.query.filter_by(
+            id=voice_id
+        ).first()
+
+        if not fetched:
+            return response_with(responses.SERVER_ERROR_404, value={
+                "error_message": "Resource does not exist"
+            })
+        voice_schema = VoiceSchema()
+        voice = voice_schema.dump(fetched)
+        return response_with(responses.SUCCESS_200, value={
+            "voice": voice
+        })
+
+    def delete(self, voice_id):
+        fetched = VoiceModel.query.filter_by(
+            id=voice_id
+        ).first()
+
+        if not fetched:
+            return response_with(responses.SERVER_ERROR_404, value={
+                "error_message": "Resource does not exist"
+            })
+        db.session.delete(fetched)
+        db.session.commit()
+        return response_with(responses.SUCCESS_204)
+
+class VoiceUpload(Resource):
+    def post(self, voice_id):
+        pass
