@@ -18,16 +18,17 @@ class Contest(Resource):
 
     def post(self):
         data = request.get_json()
-        data["admin"] = ""
         if (not data.get("name") or not data.get("url")
             or not data.get("begin_date") or not data.get("end_date") or not data.get("prize")
             or not data.get("script")):
             return response_with(responses.MISSING_PARAMETERS_422)
+        data["admin"] = 1
         contest_schema = ContestSchema()
         contest = contest_schema.load(data, session=db.session)
 
         try:
-            contest.create()
+            db.session.add(contest)
+            db.session.commit()
         except IntegrityError:
             return response_with(responses.INVALID_FIELD_NAME_SENT_422, value={
                 "error_message": "Url already exists"
@@ -64,17 +65,17 @@ class ContestDetail(Resource):
         if "banner" in data:
             contest.banner = data["banner"]
         if "url" in data:
-            contest.banner = data["url"]
+            contest.url = data["url"]
         if "begin_date" in data:
-            contest.banner = dt.strptime(data["begin_date"], "%d/%m/%Y")
+            contest.begin_date = dt.strptime(data["begin_date"], "%d/%m/%Y")
         if "end_date" in data:
-            contest.banner = dt.strptime(data["end_date"], "%d/%m/%Y")
+            contest.end_date = dt.strptime(data["end_date"], "%d/%m/%Y")
         if "prize" in data:
-            contest.banner = data["prize"]
+            contest.prize = data["prize"]
         if "script" in data:
-            contest.banner = data["script"]
+            contest.script = data["script"]
         if "recommendations" in data:
-            contest.banner = data["recommendations"]
+            contest.recommendations = data["recommendations"]
         db.session.add(contest)
         db.session.commit()
         contest_schema = ContestSchema()
