@@ -4,6 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from ..utils import responses, db, response_with
 from ..models import Contest as ContestModel
 from ..models import ContestSchema
+from datetime import datetime as dt
 
 
 class Contest(Resource):
@@ -51,6 +52,54 @@ class ContestDetail(Resource):
         return response_with(responses.SUCCESS_200, value={
             "contest": contest
         })
+    def put(self, url):
+        contest = ContestModel.query.filter_by(url=url).first()
+        if not contest:
+            return response_with(responses.SERVER_ERROR_404, value={
+                "error_message": "Resource does not exists"
+            })
+        data = request.get_json()
+        if "name" in data:
+            contest.name = data["name"]
+        if "banner" in data:
+            contest.banner = data["banner"]
+        if "url" in data:
+            contest.banner = data["url"]
+        if "begin_date" in data:
+            contest.banner = dt.strptime(data["begin_date"], "%d/%m/%Y")
+        if "end_date" in data:
+            contest.banner = dt.strptime(data["end_date"], "%d/%m/%Y")
+        if "prize" in data:
+            contest.banner = data["prize"]
+        if "script" in data:
+            contest.banner = data["script"]
+        if "recommendations" in data:
+            contest.banner = data["recommendations"]
+        db.session.add(contest)
+        db.session.commit()
+        contest_schema = ContestSchema()
+        contest = contest_schema.dump(contest)
+        return response_with(responses.SUCCESS_200, value={
+            "event": contest
+        })
+    def delete(self,url):
+        contest = ContestModel.query.filter_by(url=url).first()
+        if not contest:
+            return response_with(responses.SERVER_ERROR_404, value={
+                "error_message": "Resource does not exists"
+            })
+        db.session.delete(contest)
+        db.session.commit()
+        return response_with(responses.SUCCESS_204)
+
+
+
+
+
+
+
+
+
 
 
 
