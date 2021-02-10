@@ -18,8 +18,8 @@ import os, sys
 import logging
 
 # Resources
-from src.api.views import SignUp, Admin, Contest,ContestDetail
-
+from src.api.views import (SignUp, Admin, Contest,
+                           ContestDetail, Voice)
 
 logging.basicConfig(
     stream=sys.stdout,
@@ -46,7 +46,13 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
+# Admin Routes
 api.add_resource(SignUp, "/api/signup")
 api.add_resource(Admin, "/api/admin")
+
+# Contest Routes
 api.add_resource(Contest, "/api/contest")
 api.add_resource(ContestDetail, "/api/contest/<url>")
+
+# Voice Routes
+api.add_resource(Voice, "/api/voice")
