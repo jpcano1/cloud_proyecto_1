@@ -75,6 +75,7 @@ class VoiceUpload(Resource):
         if file:
             filename = secure_filename(file.filename)
             file.save(os.path.join(
+                "src",
                 current_app.config["RAW_AUDIOS_FOLDER"],
                 filename
             ))
