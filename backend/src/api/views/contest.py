@@ -29,6 +29,7 @@ class Contest(Resource):
         try:
             db.session.add(contest)
             db.session.commit()
+            contest = contest_schema.dump(contest)
         except IntegrityError:
             return response_with(responses.INVALID_FIELD_NAME_SENT_422, value={
                 "error_message": "Url already exists"
@@ -38,7 +39,8 @@ class Contest(Resource):
                 "error_message": str(e)
             })
         return response_with(responses.SUCCESS_200, value={
-            "message": "Contest created"
+            "message": "Contest created",
+            "contest": contest
         })
 
 class ContestDetail(Resource):
