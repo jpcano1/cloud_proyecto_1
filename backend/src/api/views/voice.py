@@ -3,7 +3,7 @@ from flask import request
 
 from ..models import Voice as VoiceModel
 from ..models import VoiceSchema
-from ..utils import response_with, responses
+from ..utils import response_with, responses, db
 
 class Voice(Resource):
     def get(self):
@@ -16,6 +16,9 @@ class Voice(Resource):
 
     def post(self):
         data = request.get_json()
+        voice_schema = VoiceSchema()
+        voice = voice_schema.load(data, session=db.session)
+        voice.create()
         return response_with(responses.SUCCESS_200, value={
             "message": "Voice uploaded!"
         })

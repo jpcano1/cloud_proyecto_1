@@ -2,6 +2,8 @@ from ..utils import db
 from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
 
+from ..models import VoiceSchema
+
 class Contest(db.Model):
     __tablename__ = "contests"
     __table_args__ = (
@@ -19,6 +21,7 @@ class Contest(db.Model):
     script = db.Column(db.String(120), nullable=False)
     recommendations = db.Column(db.String(120), default="")
     admin = db.Column(db.Integer, db.ForeignKey("admins.id"))
+    voices = db.relationship("Voice", backref="Contest", cascade="all, delete-orphan")
 
 class ContestSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
@@ -35,3 +38,8 @@ class ContestSchema(ModelSchema):
     script = fields.String(required=True)
     recommendations = fields.String(required=True)
     admin = fields.Integer(required=True)
+    voices = fields.Nested(
+        VoiceSchema,
+        many=True,
+        only=["id", "email"]
+    )
