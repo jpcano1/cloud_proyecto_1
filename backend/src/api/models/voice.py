@@ -14,6 +14,11 @@ class Voice(db.Model):
     converted = db.Column(db.Boolean, nullable=False, default=False)
     contest = db.Column(db.Integer, db.ForeignKey("contests.id"))
 
+    def create(self):
+        db.session.add(self)
+        db.session.commit()
+        return self
+
 class VoiceSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = Voice

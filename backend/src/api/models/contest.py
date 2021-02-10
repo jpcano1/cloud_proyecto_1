@@ -23,6 +23,11 @@ class Contest(db.Model):
     admin = db.Column(db.Integer, db.ForeignKey("admins.id"))
     voices = db.relationship("Voice", backref="Contest", cascade="all, delete-orphan")
 
+    def create(self):
+        db.session.add(self)
+        db.session.commit()
+        return self
+
 class ContestSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = Contest
