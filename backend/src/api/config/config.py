@@ -6,8 +6,9 @@ class Config(object):
     DEBUG = False
     TESTING = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    IMAGES_FOLDER = "static/images"
-    AUDIOS_FOLDER = "static/audios"
+    BANNERS_FOLDER = "static/banners"
+    CONVERTED_AUDIOS_FOLDER = "static/converted_audios"
+    RAW_AUDIOS_FOLDER = "static/raw_audios"
     PROPAGATE_EXCEPTIONS = True
 
 class ProductionConfig(Config):

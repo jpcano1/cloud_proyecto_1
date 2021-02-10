@@ -1,11 +1,17 @@
 from flask_restful import Resource
-from flask import request
+from flask import request, current_app, url_for
 
 from ..models import Voice as VoiceModel
 from ..models import VoiceSchema
 from ..utils import response_with, responses, db
 
 from marshmallow.exceptions import ValidationError
+
+from werkzeug.utils import secure_filename
+
+import os
+
+allowed_extensions = { ".ogg" }
 
 class Voice(Resource):
     def get(self):
@@ -62,5 +68,25 @@ class VoiceDetail(Resource):
         return response_with(responses.SUCCESS_204)
 
 class VoiceUpload(Resource):
+
     def post(self, voice_id):
-        pass
+        fetched = VoiceModel.query.get_or_404(voice_id)
+        file = request.files.get("audio", None)
+        if file:
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(
+                current_app.config["RAW_AUDIOS_FOLDER"],
+                filename
+            ))
+        else:
+            return response_with(responses.MISSING_PARAMETERS_422, value={
+                "error_message": "There is no file"
+            })
+        fetched.audio = url_for("upload_raw_audio",
+                                filename=filename,
+                                _external=True)
+        db.session.add(fetched)
+        db.session.commit()
+        return response_with(responses.SUCCESS_200, value={
+            "message": "Audio Uploaded!"
+        })
