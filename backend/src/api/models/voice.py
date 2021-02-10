@@ -15,6 +15,10 @@ class Voice(db.Model):
     contest = db.Column(db.Integer, db.ForeignKey("contests.id"))
 
     def create(self):
+        """
+        Creates the voice in the database
+        :return: The voice created
+        """
         db.session.add(self)
         db.session.commit()
         return self

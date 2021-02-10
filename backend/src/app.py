@@ -52,14 +52,29 @@ with app.app_context():
 # Files Creation
 @app.route("/uploads/raw_audio/<filename>", methods=["GET"])
 def upload_raw_audio(filename):
+    """
+    Route to upload the raw audio file
+    :param filename: The filename of the audio
+    :return: The url of the saved audio
+    """
     return send_from_directory(app.config["RAW_AUDIOS_FOLDER"], filename)
 
 @app.route("/uploads/converted_audio/<filename>", methods=["GET"])
 def upload_converted_audio(filename):
+    """
+    Route to upload the converted audio file
+    :param filename: The filename of the audio
+    :return: The url of the saved audio
+    """
     return send_from_directory(app.config["CONVERTED_AUDIOS_FOLDER"], filename)
 
 @app.route("/uploads/banner/<filename>", methods=["GET"])
 def upload_banner(filename):
+    """
+    Route to upload the banner file
+    :param filename: The filename of the banner
+    :return: The url of the saved banner
+    """
     return send_from_directory(app.config["BANNERS_FOLDER"], filename)
 
 # Admin Routes

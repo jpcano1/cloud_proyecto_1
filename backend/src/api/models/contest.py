@@ -24,6 +24,10 @@ class Contest(db.Model):
     voices = db.relationship("Voice", backref="Contest", cascade="all, delete-orphan")
 
     def create(self):
+        """
+        Creates the contest in the database
+        :return: The contest created
+        """
         db.session.add(self)
         db.session.commit()
         return self

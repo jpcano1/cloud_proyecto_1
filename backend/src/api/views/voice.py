@@ -68,12 +68,19 @@ class VoiceDetail(Resource):
         return response_with(responses.SUCCESS_204)
 
 class VoiceUpload(Resource):
-
     def post(self, voice_id):
+        """
+        Updates the voice to upload the audio file.
+        :param voice_id: The id of the existing voice
+        :return: A 200 status code message
+        """
         fetched = VoiceModel.query.get_or_404(voice_id)
+        # This is the file from the form-data
         file = request.files.get("audio", None)
+        # If it was submitted, save it
         if file:
             filename = secure_filename(file.filename)
+            # Saves it in the directory
             file.save(os.path.join(
                 "src",
                 current_app.config["RAW_AUDIOS_FOLDER"],
@@ -83,6 +90,9 @@ class VoiceUpload(Resource):
             return response_with(responses.MISSING_PARAMETERS_422, value={
                 "error_message": "There is no file"
             })
+        # To the saved audio, defines the url to find it
+        # the url is defined w.r.t the function defined
+        # if the app.py
         fetched.audio = url_for("upload_raw_audio",
                                 filename=filename,
                                 _external=True)
