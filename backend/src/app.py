@@ -56,7 +56,7 @@ def upload_raw_audio(filename):
 
 @app.route("/uploads/banner/<filename>", methods=["GET"])
 def upload_banner(filename):
-    return send_from_directory(app.config[""], filename)
+    return send_from_directory(app.config["BANNERS_FOLDER"], filename)
 
 # Admin Routes
 api.add_resource(SignUp, "/api/signup")
