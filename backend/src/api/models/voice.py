@@ -25,3 +25,4 @@ class VoiceSchema(ModelSchema):
     email = fields.Email(required=True)
     audio = fields.String(dump_only=True)
     observations = fields.String()
+    contest = fields.Integer(required=True)

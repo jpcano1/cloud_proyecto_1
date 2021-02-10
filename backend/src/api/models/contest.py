@@ -36,7 +36,7 @@ class ContestSchema(ModelSchema):
     end_date = fields.DateTime(format="%d/%m/%Y", required=True)
     prize = fields.Float(required=True)
     script = fields.String(required=True)
-    recommendations = fields.String(required=True)
+    recommendations = fields.String()
     admin = fields.Integer(required=True)
     voices = fields.Nested(
         VoiceSchema,

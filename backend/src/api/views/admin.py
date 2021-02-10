@@ -6,6 +6,7 @@ from ..models import AdminSchema
 from sqlalchemy.exc import IntegrityError
 from datetime import timedelta
 from flask_jwt_extended import create_access_token
+from marshmallow.exceptions import ValidationError
 
 class SignUp(Resource):
     def post(self):
@@ -19,18 +20,23 @@ class SignUp(Resource):
         all the parameters
         """
         data = request.get_json()
-        if (not data.get("password") or not data.get("email")
-            or not data.get("name") or not data.get("last_name")):
-            return response_with(responses.MISSING_PARAMETERS_422)
-        data["password"] = AdminModel.generate_hash(data["password"])
         admin_schema = AdminSchema()
-        admin = admin_schema.load(data, session=db.session)
-
         try:
+            data["password"] = AdminModel.generate_hash(data["password"])
+            admin = admin_schema.load(data, session=db.session)
             admin.create()
         except IntegrityError:
             return response_with(responses.INVALID_FIELD_NAME_SENT_422, value={
                 "error_message": "Email already exists"
+            })
+        except KeyError:
+            return response_with(responses.MISSING_PARAMETERS_422, value={
+                "error_message": "Missing Fields: password"
+            })
+        except ValidationError as e:
+            a = e.messages.keys()
+            return response_with(responses.MISSING_PARAMETERS_422, value={
+                "error_message": "Missing Fields: " + ", ".join(a)
             })
         except Exception as e:
             return response_with(responses.INVALID_INPUT_422, value={

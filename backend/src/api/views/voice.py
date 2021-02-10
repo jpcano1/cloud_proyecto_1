@@ -5,6 +5,8 @@ from ..models import Voice as VoiceModel
 from ..models import VoiceSchema
 from ..utils import response_with, responses, db
 
+from marshmallow.exceptions import ValidationError
+
 class Voice(Resource):
     def get(self):
         fetched = VoiceModel.query.all()
@@ -16,9 +18,16 @@ class Voice(Resource):
 
     def post(self):
         data = request.get_json()
+        data["contest"] = 1
         voice_schema = VoiceSchema()
-        voice = voice_schema.load(data, session=db.session)
-        voice.create()
+        try:
+            voice = voice_schema.load(data, session=db.session)
+            voice.create()
+        except ValidationError as e:
+            a = e.messages.keys()
+            return response_with(responses.MISSING_PARAMETERS_422, value={
+                "error_message": "Missing Fields: " + ", ".join(a)
+            })
         return response_with(responses.SUCCESS_200, value={
             "message": "Voice uploaded!"
         })
