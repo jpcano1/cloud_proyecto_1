@@ -36,3 +36,4 @@ services:
 
   redis:
     image: redis
+    container_name: cloud_redis
