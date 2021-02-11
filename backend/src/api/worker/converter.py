@@ -10,14 +10,13 @@ backend = os.getenv("CELERY_BACKEND", "redis://localhost:6379/0")
 celery_app = Celery("converter", broker=broker, backend=backend)
 
 celery_app.conf.beat_schedule = {
-    "convert-audio-test": {
-        "task": "test",
+    "app-schedule": {
+        "task": "audio_converter",
         "schedule": timedelta(seconds=5),
+        "args": ("Hola Mundo", )
     }
 }
 
-@celery_app.task
-def test():
-    print("Hola mundo")
-
-test.delay()
+@celery_app.task(name="audio_converter")
+def audio_converter(message):
+    os.system(f"echo {message}")
