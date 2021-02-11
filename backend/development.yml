@@ -18,8 +18,8 @@ services:
 
   celery_worker:
     <<: *app
-    image: cloud_celery_worker
-    container_name: local_cloud_celery_worker
+    image: local_cloud_celery_worker
+    container_name: cloud_celery_worker
     depends_on:
       - redis
     ports: []
@@ -27,8 +27,8 @@ services:
 
   celery_beat:
     <<: *app
-    image: cloud_celery_beat
-    container_name: local_cloud_celery_beat
+    image: local_cloud_celery_beat
+    container_name: cloud_celery_beat
     depends_on:
       - redis
     ports: []
