@@ -2,6 +2,7 @@
 from flask_restful import Resource
 from flask import request
 from sqlalchemy.exc import IntegrityError
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 # Util Imports
 from ..utils import responses, db, response_with
@@ -14,7 +15,6 @@ from ..models import Contest as ContestModel, ContestSchema
 
 from datetime import datetime as dt
 
-
 class Contest(Resource):
     def get(self):
         contests = ContestModel.query.all()
@@ -24,9 +24,10 @@ class Contest(Resource):
             "contests": contests
         })
 
+    @jwt_required
     def post(self):
         data = request.get_json()
-        data["admin"] = 1
+        data["admin"] = get_jwt_identity()
         contest_schema = ContestSchema()
 
         try:
@@ -51,7 +52,9 @@ class Contest(Resource):
 
 class ContestDetail(Resource):
     def get(self, url):
-        contest = ContestModel.query.filter_by(url=url).first()
+        contest = ContestModel.query.filter_by(
+            url=url
+        ).first()
         if not contest:
             return response_with(responses.SERVER_ERROR_404, value={
                 "error_message": "Resource does not exists"
@@ -62,8 +65,12 @@ class ContestDetail(Resource):
             "contest": contest
         })
 
+    @jwt_required
     def put(self, url):
-        contest = ContestModel.query.filter_by(url=url).first()
+        admin_id = get_jwt_identity()
+        contest = ContestModel.query.filter_by(
+            url=url, admin=admin_id
+        ).first()
         if not contest:
             return response_with(responses.SERVER_ERROR_404, value={
                 "error_message": "Resource does not exists"
@@ -94,8 +101,12 @@ class ContestDetail(Resource):
             "event": contest
         })
 
-    def delete(self,url):
-        contest = ContestModel.query.filter_by(url=url).first()
+    @jwt_required
+    def delete(self, url):
+        admin_id = get_jwt_identity()
+        contest = ContestModel.query.filter_by(
+            url=url, admin=admin_id
+        ).first()
         if not contest:
             return response_with(responses.SERVER_ERROR_404, value={
                 "error_message": "Resource does not exists"
