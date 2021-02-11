@@ -1,21 +1,31 @@
+# Flask Imports
 from flask_restful import Resource
 from flask import request, current_app, url_for
 
+# Models and Utils Imports
 from ..models import Voice as VoiceModel
 from ..models import VoiceSchema
 from ..utils import response_with, responses, db
 
+# Marshmallow imports
 from marshmallow.exceptions import ValidationError
 
 from werkzeug.utils import secure_filename
 
+# Os Imports
 import os
-
-allowed_extensions = { ".ogg" }
 
 class Voice(Resource):
     def get(self):
-        fetched = VoiceModel.query.all()
+        """
+        Fetches the entire database of voices
+        if the voices we're already converted
+        :return: A 200 status code message
+        """
+        fetched = VoiceModel.query.filter_by(
+            converted=True
+        ).all()
+
         voice_schema = VoiceSchema(many=True)
         voices = voice_schema.dump(fetched)
         return response_with(responses.SUCCESS_200, value={
@@ -23,6 +33,12 @@ class Voice(Resource):
         })
 
     def post(self):
+        """
+        Creates a voice in the database
+        :return: A 200 status code message
+        :exception ValidationError: If the
+        body request has missing fields.
+        """
         data = request.get_json()
         data["contest"] = 1
         voice_schema = VoiceSchema()
@@ -40,13 +56,21 @@ class Voice(Resource):
 
 class VoiceDetail(Resource):
     def get(self, voice_id):
+        """
+        Fetches a single voice from the database
+        if it was converted
+        :param voice_id: The id of the voice
+        :return: A 200 status code message
+        """
         fetched = VoiceModel.query.filter_by(
-            id=voice_id
+            id=voice_id, converted=True
         ).first()
 
+        # If it wasn't found, it returns a 404 status
+        # code message.
         if not fetched:
             return response_with(responses.SERVER_ERROR_404, value={
-                "error_message": "Resource does not exist"
+                "error_message": "Resource does not exist or it hasn't been converted"
             })
         voice_schema = VoiceSchema()
         voice = voice_schema.dump(fetched)
@@ -55,8 +79,16 @@ class VoiceDetail(Resource):
         })
 
     def delete(self, voice_id):
+        """
+        Deletes a voice from the database
+        :param voice_id: The id of the voice to be deleted
+        :return: A 204 status code message
+        """
+
+        # Fetches the voice, if it's not found,
+        # it returns a 404 status code message
         fetched = VoiceModel.query.filter_by(
-            id=voice_id
+            id=voice_id, converted=True
         ).first()
 
         if not fetched:
