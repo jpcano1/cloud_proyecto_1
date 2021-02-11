@@ -21,7 +21,7 @@ def init_app(app: Flask):
     celery_app.conf.beat_schedule = {
         "app-schedule": {
             "task": "audio_converter",
-            "schedule": timedelta(seconds=5)
+            "schedule": timedelta(seconds=15)
         }
     }
 

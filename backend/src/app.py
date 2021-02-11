@@ -1,5 +1,5 @@
 # Flask Configurations
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, render_template
 from flask_bcrypt import Bcrypt
 from flask_restful import Api
 from flask_cors import CORS
@@ -12,7 +12,7 @@ from src.api.config import (DevelopmentConfig,
 from src.api.worker import init_app
 
 # Database Configurations
-from src.api.utils import db
+from src.api.utils import db, mail, send_email
 
 # OS Configurations
 import os, sys
@@ -47,6 +47,7 @@ bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 CORS(app)
 celery_app = init_app(app)
+mail.init_app(app)
 
 db.init_app(app)
 with app.app_context():

@@ -1,7 +1,8 @@
 from celery import current_app
 from ..models import Voice as VoiceModel
-from ..utils import db
+from ..utils import db, send_email
 import os
+from flask import render_template
 
 def retrieve():
     fetched = VoiceModel.query.filter_by(
@@ -9,6 +10,18 @@ def retrieve():
     ).all()
 
     return fetched
+
+def notify_converted(name, email):
+    html = render_template(
+        "email_templates/notification_email.html",
+        name=name
+    )
+    send_email(
+        to=email,
+        subject="Urgent",
+        template=html
+    )
+    print("Email Sent!")
 
 def convert(audio_url):
     full_path = audio_url[1:]
@@ -25,11 +38,13 @@ def converter():
 
     counter = 0
     for voice in fetched_voices:
-        path = convert(voice.audio)
-        voice.converted = True
-        voice.audio = path
-        db.session.add(voice)
-        db.session.commit()
-        print(f"Voice: {voice.id} converted")
-        counter += 1
+        if voice.audio:
+            path = convert(voice.audio)
+            voice.converted = True
+            voice.audio = path
+            db.session.add(voice)
+            db.session.commit()
+            print(f"Voice: {voice.id} converted")
+            notify_converted(voice.name, voice.email)
+            counter += 1
     print(f"Voices converted: {counter}")
