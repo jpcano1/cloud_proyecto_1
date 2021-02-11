@@ -1,0 +1,15 @@
+flask
+flask-sqlalchemy
+flask-marshmallow
+sqlalchemy
+marshmallow_sqlalchemy
+python-dotenv
+marshmallow
+marshmallow-enum
+flask-jwt-extended
+Flask-Mail
+werkzeug
+flask-restful
+flask-bcrypt
+flask-cors
+celery[redis]

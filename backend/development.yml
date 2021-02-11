@@ -1,0 +1,38 @@
+version: "3"
+
+services:
+  app: &app
+    container_name: cloud_app
+    image: local_cloud_app
+    build:
+      context: .
+      dockerfile: compose/development/app/Dockerfile
+    env_file:
+      - env/development/app
+    volumes:
+      - ./wsgi.py:/app/wsgi.py
+      - ./src:/app/src
+    ports:
+      - 5000:5000
+    command: /app/start
+
+  celery_worker:
+    <<: *app
+    image: cloud_celery_worker
+    container_name: local_cloud_celery_worker
+    depends_on:
+      - redis
+    ports: []
+    command: /app/celery_worker_start
+
+  celery_beat:
+    <<: *app
+    image: cloud_celery_beat
+    container_name: local_cloud_celery_beat
+    depends_on:
+      - redis
+    ports: []
+    command: /app/celery_beat_start
+
+  redis:
+    image: redis

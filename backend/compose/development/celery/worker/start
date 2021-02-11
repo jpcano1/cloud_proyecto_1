@@ -1,0 +1,3 @@
+#!/bin/bash
+
+celery --app src.celery_app worker -l info
