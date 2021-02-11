@@ -10,6 +10,8 @@ class Config(object):
     CONVERTED_AUDIOS_FOLDER = "static/converted_audios"
     RAW_AUDIOS_FOLDER = "static/raw_audios"
     PROPAGATE_EXCEPTIONS = True
+    CELERY_BROKER = os.getenv("CELERY_BROKER", "redis://localhost:6379/0")
+    CELERY_BACKEND = os.getenv("CELERY_BACKEND", "redis://localhost:6379/0")
 
 class ProductionConfig(Config):
     POSTGRES_USERNAME = os.getenv("POSTGRES_USER")

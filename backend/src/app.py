@@ -9,6 +9,7 @@ from flask_jwt_extended import JWTManager
 from src.api.config import (DevelopmentConfig,
                             ProductionConfig,
                             TestingConfig)
+from src.api.worker import init_app
 
 # Database Configurations
 from src.api.utils import db
@@ -31,10 +32,6 @@ logging.basicConfig(
 )
 
 app = Flask(__name__)
-api = Api(app)
-bcrypt = Bcrypt(app)
-jwt = JWTManager(app)
-CORS(app)
 
 if os.getenv("WORK_ENV") == "PROD":
     app_config = ProductionConfig
@@ -44,6 +41,12 @@ else:
     app_config = DevelopmentConfig
 
 app.config.from_object(app_config)
+
+api = Api(app)
+bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
+CORS(app)
+celery_app = init_app(app)
 
 db.init_app(app)
 with app.app_context():
