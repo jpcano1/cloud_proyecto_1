@@ -53,7 +53,7 @@ with app.app_context():
     db.create_all()
 
 # Files Creation
-@app.route("/uploads/raw_audio/<filename>", methods=["GET"])
+@app.route("/src/static/raw_audios/<filename>", methods=["GET"])
 def upload_raw_audio(filename):
     """
     Route to upload the raw audio file
@@ -62,7 +62,7 @@ def upload_raw_audio(filename):
     """
     return send_from_directory(app.config["RAW_AUDIOS_FOLDER"], filename)
 
-@app.route("/uploads/converted_audio/<filename>", methods=["GET"])
+@app.route("/src/static/converted_audios/<filename>", methods=["GET"])
 def upload_converted_audio(filename):
     """
     Route to upload the converted audio file

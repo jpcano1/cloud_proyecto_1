@@ -79,7 +79,10 @@ class VoiceUpload(Resource):
         file = request.files.get("audio", None)
         # If it was submitted, save it
         if file:
-            filename = secure_filename(file.filename)
+            filename = secure_filename("_".join([
+                str(fetched.id), fetched.name,
+                fetched.last_name, file.filename
+            ]))
             # Saves it in the directory
             file.save(os.path.join(
                 "src",
@@ -92,10 +95,10 @@ class VoiceUpload(Resource):
             })
         # To the saved audio, defines the url to find it
         # the url is defined w.r.t the function defined
-        # if the app.py
+        # in the app.py
         fetched.audio = url_for("upload_raw_audio",
                                 filename=filename,
-                                _external=True)
+                                _external=False)
         db.session.add(fetched)
         db.session.commit()
         return response_with(responses.SUCCESS_200, value={
