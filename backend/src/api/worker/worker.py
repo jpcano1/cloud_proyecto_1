@@ -16,6 +16,8 @@ def init_app(app: Flask):
     celery_app = Celery(app.import_name,
                         broker=app.config["CELERY_BROKER"],
                         backend=app.config["CELERY_BACKEND"])
+
+    # The beat scheduler
     celery_app.conf.beat_schedule = {
         "app-schedule": {
             "task": "audio_converter",
@@ -23,12 +25,21 @@ def init_app(app: Flask):
         }
     }
 
+    # The task base app
     TaskBase = celery_app.Task
 
+    # The new task class
     class ContextTask(TaskBase):
         abstract = True
 
         def __call__(self, *args, **kwargs):
+            """
+            When celery calls the task, it will do it
+            under a context
+            :param args: The function arguments
+            :param kwargs: The function keyword arguments
+            :return: The task call under the flask app context
+            """
             with app.app_context():
                 return TaskBase.__call__(self, *args, **kwargs)
 
