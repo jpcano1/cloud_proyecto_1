@@ -12,7 +12,7 @@ from marshmallow.exceptions import ValidationError
 
 from werkzeug.utils import secure_filename
 
-# Os Imports
+# OS Imports
 import os
 
 class Voice(Resource):
@@ -42,6 +42,7 @@ class Voice(Resource):
         data = request.get_json()
         data["contest"] = 1
         voice_schema = VoiceSchema()
+
         try:
             voice = voice_schema.load(data, session=db.session)
             voice.create()
