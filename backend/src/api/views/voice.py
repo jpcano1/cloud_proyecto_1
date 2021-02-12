@@ -24,7 +24,7 @@ class Voice(Resource):
         """
         fetched = VoiceModel.query.filter_by(
             converted=True
-        ).all()
+        ).order_by(VoiceModel.created.desc())
 
         voice_schema = VoiceSchema(many=True)
         voices = voice_schema.dump(fetched)
@@ -40,19 +40,19 @@ class Voice(Resource):
         body request has missing fields.
         """
         data = request.get_json()
-        data["contest"] = 1
         voice_schema = VoiceSchema()
 
         try:
             voice = voice_schema.load(data, session=db.session)
-            voice.create()
+            result = voice_schema.dump(voice.create())
         except ValidationError as e:
             a = e.messages.keys()
             return response_with(responses.MISSING_PARAMETERS_422, value={
                 "error_message": "Missing Fields: " + ", ".join(a)
             })
         return response_with(responses.SUCCESS_200, value={
-            "message": "Voice uploaded!"
+            "message": "Voice uploaded!",
+            "voice": result
         })
 
 class VoiceDetail(Resource):

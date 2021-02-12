@@ -1,5 +1,5 @@
 # Flask Configurations
-from flask import Flask, send_from_directory, render_template
+from flask import Flask, send_from_directory
 from flask_bcrypt import Bcrypt
 from flask_restful import Api
 from flask_cors import CORS
@@ -19,8 +19,9 @@ import os, sys
 import logging
 
 # Resources
-from src.api.views import (SignUp, Admin, Contest, VoiceUpload, BannerUpload,
-                           ContestDetail, Voice, VoiceDetail, AdminDetail)
+from src.api.views import (SignUp, Admin, Contest, VoiceUpload,
+                           BannerUpload, Login, ContestDetail,
+                           Voice, VoiceDetail, AdminDetail)
 
 from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
@@ -83,6 +84,7 @@ def upload_banner(filename):
 
 # Admin Routes
 api.add_resource(SignUp, "/api/signup")
+api.add_resource(Login, "/api/login")
 api.add_resource(Admin, "/api/admin")
 api.add_resource(AdminDetail, "/api/admin/<int:admin_id>")
 

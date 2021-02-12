@@ -13,6 +13,7 @@ class Voice(db.Model):
     observations = db.Column(db.String(120), default="")
     converted = db.Column(db.Boolean, nullable=False, default=False)
     contest = db.Column(db.Integer, db.ForeignKey("contests.id"))
+    created = db.Column(db.DateTime, server_default=db.func.now())
 
     def create(self):
         """
@@ -35,3 +36,4 @@ class VoiceSchema(ModelSchema):
     audio = fields.String(dump_only=True)
     observations = fields.String()
     contest = fields.Integer(required=True)
+    created = fields.DateTime(format="%d/%m/%Y", dump_only=True)

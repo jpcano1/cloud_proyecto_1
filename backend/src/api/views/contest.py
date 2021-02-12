@@ -37,7 +37,7 @@ class Contest(Resource):
 
         try:
             contest = contest_schema.load(data, session=db.session)
-            contest.create()
+            result = contest_schema.dump(contest.create())
         except ValidationError as e:
             a = e.messages.keys()
             return response_with(responses.MISSING_PARAMETERS_422, value={
@@ -53,6 +53,7 @@ class Contest(Resource):
             })
         return response_with(responses.SUCCESS_200, value={
             "message": "Contest created",
+            "contest": result
         })
 
 class ContestDetail(Resource):
@@ -129,10 +130,13 @@ class BannerUpload(Resource):
         admin_id = get_jwt_identity()
         fetched = ContestModel.query.filter_by(
             admin=admin_id, id=contest_id
-        )
+        ).first()
         file = request.files.get("banner", None)
         if file and self.contest_controller(file.content_type):
-            filename = secure_filename(file.filename)
+            filename = secure_filename("_".join([
+                fetched.url,
+                file.filename
+            ]))
             file.save(os.path.join(
                 "src",
                 current_app.config["BANNERS_FOLDER"],
