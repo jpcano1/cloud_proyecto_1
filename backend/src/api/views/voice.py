@@ -66,7 +66,6 @@ class VoiceDetail(Resource):
         fetched = VoiceModel.query.filter_by(
             id=voice_id, converted=True
         ).first()
-
         # If it wasn't found, it returns a 404 status
         # code message.
         if not fetched:
@@ -85,7 +84,6 @@ class VoiceDetail(Resource):
         :param voice_id: The id of the voice to be deleted
         :return: A 204 status code message
         """
-
         # Fetches the voice, if it's not found,
         # it returns a 404 status code message
         fetched = VoiceModel.query.filter_by(

@@ -1,8 +1,10 @@
 # Flask Libraries
 from flask_restful import Resource
-from flask import request
+from flask import request, current_app, url_for
 from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import jwt_required, get_jwt_identity
+
+from werkzeug.utils import secure_filename
 
 # Util Imports
 from ..utils import responses, db, response_with
@@ -14,6 +16,9 @@ from marshmallow.exceptions import ValidationError
 from ..models import Contest as ContestModel, ContestSchema
 
 from datetime import datetime as dt
+import os
+
+from ..controllers import ContestController
 
 class Contest(Resource):
     def get(self):
@@ -75,6 +80,7 @@ class ContestDetail(Resource):
             return response_with(responses.SERVER_ERROR_404, value={
                 "error_message": "Resource does not exists"
             })
+
         data = request.get_json()
         if "name" in data:
             contest.name = data["name"]
@@ -115,16 +121,33 @@ class ContestDetail(Resource):
         db.session.commit()
         return response_with(responses.SUCCESS_204)
 
+class BannerUpload(Resource):
+    contest_controller = ContestController()
 
-
-
-
-
-
-
-
-
-
-
-
-
+    @jwt_required
+    def post(self, contest_id):
+        admin_id = get_jwt_identity()
+        fetched = ContestModel.query.filter_by(
+            admin=admin_id, id=contest_id
+        )
+        file = request.files.get("banner", None)
+        if file and self.contest_controller(file.content_type):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(
+                "src",
+                current_app.config["BANNERS_FOLDER"],
+                filename
+            ))
+        else:
+            return response_with(responses.INVALID_INPUT_422, value={
+                "message": "There is no file"
+            })
+        if fetched:
+            fetched.banner = url_for("upload_banner",
+                                     filename=filename)
+            db.session.add(fetched)
+            db.session.commit()
+            return response_with(responses.SUCCESS_200, value={
+                "message": "File Uploaded!"
+            })
+        return response_with(responses.FORBIDDEN_403)

@@ -53,7 +53,7 @@ class Login(Resource):
         :return: The logged on admin user.
         """
         data = request.get_json()
-        current_user = AdminModel.find_by_email(data["email"])
+        current_user = AdminModel.find_by_email(data.get("email"))
 
         if not current_user:
             return response_with(responses.INVALID_FIELD_NAME_SENT_422, value={
@@ -87,4 +87,13 @@ class Admin(Resource):
         admins = admin_schema.dump(fetched)
         return response_with(responses.SUCCESS_200, value={
             "admins": admins
+        })
+
+class AdminDetail(Resource):
+    def get(self, admin_id):
+        fetched = AdminModel.query.get_or_404(admin_id)
+        admin_schema = AdminSchema()
+        admin = admin_schema.dump(fetched)
+        return response_with(responses.SUCCESS_200, value={
+            "admin": admin
         })

@@ -12,15 +12,15 @@ from src.api.config import (DevelopmentConfig,
 from src.api.worker import init_app
 
 # Database Configurations
-from src.api.utils import db, mail, send_email
+from src.api.utils import db, mail
 
 # OS Configurations
 import os, sys
 import logging
 
 # Resources
-from src.api.views import (SignUp, Admin, Contest, VoiceUpload,
-                           ContestDetail, Voice, VoiceDetail)
+from src.api.views import (SignUp, Admin, Contest, VoiceUpload, BannerUpload,
+                           ContestDetail, Voice, VoiceDetail, AdminDetail)
 
 from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
@@ -84,10 +84,12 @@ def upload_banner(filename):
 # Admin Routes
 api.add_resource(SignUp, "/api/signup")
 api.add_resource(Admin, "/api/admin")
+api.add_resource(AdminDetail, "/api/admin/<int:admin_id>")
 
 # Contest Routes
 api.add_resource(Contest, "/api/contest")
 api.add_resource(ContestDetail, "/api/contest/<url>")
+api.add_resource(BannerUpload, "/api/banner/<int:contest_id>")
 
 # Voice Routes
 api.add_resource(Voice, "/api/voice")
