@@ -5,6 +5,7 @@ WORKDIR $APP_DIR
 
 ADD src $APP_DIR/src
 ADD requirements/dev.txt $APP_DIR
+ADD requirements/prod.txt $APP_DIR
 ADD wsgi.py $APP_DIR
 
 # Run Commands
@@ -35,3 +36,4 @@ RUN apt-get update && apt full-upgrade -y && \
 
 RUN pip install --upgrade pip
 RUN pip install -r dev.txt
+RUN pip install -r prod.txt
