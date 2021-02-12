@@ -134,4 +134,4 @@ venv
 # Pyre type checker
 .pyre/
 
-static/
+src/static/
