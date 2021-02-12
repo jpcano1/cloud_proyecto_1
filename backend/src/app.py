@@ -54,6 +54,15 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
+if not os.path.exists(app.config["BANNERS_FOLDER"]):
+    os.makedirs(app.config["BANNERS_FOLDER"])
+
+if not os.path.exists(app.config["CONVERTED_AUDIOS_FOLDER"]):
+    os.makedirs(app.config["CONVERTED_AUDIOS_FOLDER"])
+
+if not os.path.exists(app.config["RAW_AUDIOS_FOLDER"]):
+    os.makedirs(app.config["RAW_AUDIOS_FOLDER"])
+
 # Files Creation
 @app.route("/src/static/raw_audios/<filename>", methods=["GET"])
 def upload_raw_audio(filename):

@@ -133,3 +133,5 @@ dmypy.json
 venv
 # Pyre type checker
 .pyre/
+
+static/
