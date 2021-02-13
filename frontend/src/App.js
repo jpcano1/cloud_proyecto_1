@@ -16,7 +16,7 @@ function App() {
         <Switch>
           <Route exact path = "/" component={Landing}/>
           <Route exact path = "/login" component={Login}/>
-          <Route exact path = "/signUp" component = {SignUp} />
+          <Route exact path = "/signup" component = {SignUp} />
           <Route exact path = "/contest" component = {AdminMenu} />
           <Route exact path = "/contest/:url" component = {Contest} />
         </Switch>
