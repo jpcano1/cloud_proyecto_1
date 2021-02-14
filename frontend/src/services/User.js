@@ -1,10 +1,10 @@
 import axios from "axios";
 import Cookie from "js-cookie";
 
-const url = "http://172.24.98.90/login"
+const url = "http://localhost:5000/api"
 
 export async function post_login(data){
-   axios.post(url,data).then((datar) => {
+   axios.post(url+"/login",data).then((datar) => {
        Cookie.set("access_token",datar.data.access_token);
    });
 }

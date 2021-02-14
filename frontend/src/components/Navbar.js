@@ -11,7 +11,7 @@ export default function NavbarO(){
     const [isLogged,setLogged] = useState(false); 
 
     useEffect(() => {
-        let token = Cookie.get("token"); 
+        let token = Cookie.get("access_token"); 
         if(token){
             setLogged(true)
         }

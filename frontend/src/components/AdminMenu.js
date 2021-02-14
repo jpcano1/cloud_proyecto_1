@@ -1,23 +1,23 @@
 import React, {useEffect, useState}from 'react'; 
 import {Button, Modal} from 'react-bootstrap';
-import {get_contests} from '../services/Contest';
+import {get_contests, post_contest, delete_contest,put_contest, upload_banner} from '../services/Contest';
 import DatePicker from "react-datepicker";
-import Card from '../components/Card';
 
 
 export default function AdminMenu(){
     const [contests, setContest] = useState([]);
     const[contestSelected, setContestSelected] = useState([]); 
 
-    const[name, setName] = useState([]);
+    const[name, setName] = useState("");
     const[banner, setBanner] = useState([]); 
-    const[url, setUrl] = useState([]); 
+    const[url, setUrl] = useState(""); 
     const[begin_date, setBegin_date] = useState(new Date());
     const[end_date, setEnd_date] = useState(new Date()); 
-    const[prize, setPrize] = useState([]); 
-    const[script, setScript] = useState([]);
-    const[recommendations, setRecommendations] = useState([]);
+    const[prize, setPrize] = useState(""); 
+    const[script, setScript] = useState("");
+    const[recommendations, setRecommendations] = useState("");
     const[showCreateModal, setShowCreateModal] = useState(false);
+    const[showEditModal, setShowEditModal] = useState(false);
     
     useEffect( ()  => {
         fetchContest()
@@ -25,7 +25,6 @@ export default function AdminMenu(){
 
      async function fetchContest(){
         let answer = await get_contests();
-        console.log(answer);
         setContest(answer);
     }
 
@@ -38,6 +37,45 @@ export default function AdminMenu(){
         newContest.prize = prize; 
         newContest.script = script; 
         newContest.recommendations = recommendations; 
+        let answer = await post_contest(newContest); 
+        fileUpload(answer.contest.id)
+        setShowCreateModal(false);
+        fetchContest();
+    }
+    async function deleteContest(url){
+      let respuesta = await delete_contest(url)
+      fetchContest();
+    }
+    async function editContest(){
+      let newContest = new Object();
+      if(name){
+        newContest.name = name;  
+      }
+       
+        newContest.url = contestSelected.url;
+
+        newContest.begin_date = begin_date.getDate() + "/"+ begin_date.getMonth() + "/"+ begin_date.getFullYear();
+        newContest.end_date = end_date.getDate() + "/"+ end_date.getMonth() + "/"+ end_date.getFullYear();
+      if(prize){
+        newContest.prize = prize; 
+      }
+      if(script){
+        newContest.script = script;
+      }
+      if(recommendations){
+        newContest.recommendations = recommendations; 
+
+      }
+        let answer = await put_contest(newContest); 
+        setShowEditModal(false);
+        fetchContest();
+    }
+    async function fileUpload(id){
+      console.log(id);
+      console.log(banner);
+      const fd = new FormData();
+      fd.append('banner', banner); 
+      //await upload_banner(id, fd)
     }
     return(
     <div className="container-fluid">
@@ -61,14 +99,23 @@ export default function AdminMenu(){
                 <h3>Your Contests:</h3>
             </div>
         </div>
-        <div className="row justify-content-center">
-            <div className="col">
+        <div className="container row">
                     {contests.length == 0 && 
                     <h4>You don't have any contest active :(</h4>
                     }
-                    {contests.map(h => {return <Card contest={h} key = {h.id}/>})}
-            </div>
-            
+                    {contests.map(h => 
+                      {return <div className="card m-2" style={{width: "18rem"}}>
+                        <img className="card-img-top" src="" alt={h.name}/>
+                            <div className="card-body">
+                                <h5 className="card-title">{h.name}</h5>
+                                <Button className="m-1" variant="outline-danger" onClick={() => deleteContest(h.url)}>Delete</Button>
+                                <Button className="m-1" variant="outline-info" onClick={() => {
+                                  setContestSelected(h);
+                                  setShowEditModal(true)
+                                }}>Edit</Button>
+                                <Button className="m-1" variant="outline-info" href={'/contest/' + h.url}>Details</Button>
+                            </div>
+                        </div>})}
         </div>  
 
         <Modal show={showCreateModal} idEvent={contestSelected} onHide={() => setShowCreateModal(false)}>
@@ -101,9 +148,9 @@ export default function AdminMenu(){
                     <div className="form-group">
                       <label htmlfor="inputType">Banner</label>
                       <input
-                        type="text"
-                        className="form-control"
-                        onChange={(e) => setBanner(e.target.value)}
+                        type="file"
+                        className="form-control-file"
+                        onChange={(e) => setBanner(e.target.files[0])}
                       />
                     </div>
                     <div className="form-group">
@@ -155,7 +202,7 @@ export default function AdminMenu(){
                     data-dismiss="modal"
                     onClick={() => setShowCreateModal(false)}
                   >
-                    Cancelar
+                    Cancel
               </button>
                   <button
                     type="button"
@@ -163,6 +210,109 @@ export default function AdminMenu(){
                     onClick={() => createContest()}
                   >
                     Create Constest
+              </button>
+                </div>
+              </div>
+            </Modal>
+
+
+            <Modal show={showEditModal} idEvent={contestSelected} onHide={() => setShowEditModal(false)}>
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title" id="addProductModalLabel">
+                    Edit a Contest
+              </h5>
+                  <button
+                    type="button"
+                    className="close"
+                    data-dismiss="modal"
+                    aria-label="Close"
+                    onClick={() => setShowEditModal(false)}
+                  >
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <form>
+                    <div className="form-group">
+                      <label htmlfor="inputName">Name</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder={contestSelected.name}
+                        id="inputName"
+                        onChange={(e) => setName(e.target.value)}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlfor="inputType">Banner</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        onChange={(e) => setBanner(e.target.value)}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlfor="inputQuantity">Url</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder={contestSelected.url}
+                        onChange={(e) => setUrl(e.target.value)}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlfor="inputPrice">Begin Date</label>
+                      <DatePicker selected={begin_date} onChange={date => setBegin_date(date)} dateFormat="yyyy/MM/dd" />
+                    </div>
+                    <div className="form-group">
+                      <label htmlfor="inputPrice">End  Date</label>
+                      <DatePicker selected={end_date} onChange={date => setEnd_date(date)} dateFormat="yyyy/MM/dd" />
+                    </div>
+                    <div className="form-group">
+                      <label htmlfor="inputPrice">Prize</label>
+                      <input
+                        type="number"
+                        className="form-control"
+                        placeholder={contestSelected.prize}
+                        onChange={(e) => setPrize(e.target.value)}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlfor="inputPrice">Script</label>
+                      <input
+                        type="text"
+                        placeholder={contestSelected.script}
+                        className="form-control"
+                        onChange={(e) => setScript(e.target.value)}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlfor="inputPrice">Recommendations</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder={contestSelected.recommendations}
+                        onChange={(e) => setRecommendations(e.target.value)}
+                      />
+                    </div>
+                  </form>
+                </div>
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    data-dismiss="modal"
+                    onClick={() => setShowEditModal(false)}
+                  >
+                    Cancel
+              </button>
+                  <button
+                    type="button"
+                    className="btn btn-success"
+                    onClick={() => editContest()}
+                  >
+                    Edit Constest
               </button>
                 </div>
               </div>
