@@ -18,7 +18,7 @@ export default function Login(){
       event.preventDefault();
       let data = {"email": email, "password":password}; 
       let respuest = await post_login(data);
-      history.push("/events");
+      history.push("/contest");
     }
     return(
         <div className="Login justify-content-center center text-center col-4">

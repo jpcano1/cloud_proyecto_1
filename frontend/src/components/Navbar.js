@@ -1,16 +1,26 @@
-import React from 'react';
+import React,{useEffect, useState} from 'react';
 import {Link} from "react-router-dom";
 import { Navbar,Button,FormControl,Form,Nav } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/NavbarCss.css'
+import Cookie from "js-cookie";
 
 
 export default function NavbarO(){
 
+    const [isLogged,setLogged] = useState(false); 
+
+    useEffect(() => {
+        let token = Cookie.get("token"); 
+        if(token){
+            setLogged(true)
+        }
+    })
+
 
     return( 
         <Navbar bg="dark" variant="dark">
-            <Navbar.Brand href="#home">
+            <Navbar.Brand href="/">
                 <img
                     src="https://avmusicacademy.org/sites/default/files/microphone.png"
                     width="30"
@@ -23,10 +33,17 @@ export default function NavbarO(){
         <Nav className="mr-auto">
         </Nav>
         <div className="button-space">
-        <Button variant="outline-info" href="/login">Login</Button>
+        {isLogged
+        ? <Button variant="outline-info" href="/">Home</Button>
+        : <Button variant="outline-info" href="/login">Login</Button>
+        }
+        
         </div>
         <div  className="button-space">
-        <Button variant="outline-info" href="/signup">SignUp</Button>
+        {isLogged
+        ? <Button variant="outline-info" href="/">Log Out</Button>
+        : <Button variant="outline-info" href="/signup">Sign Up</Button>
+        }
         </div>
       </Navbar>)    
 }   

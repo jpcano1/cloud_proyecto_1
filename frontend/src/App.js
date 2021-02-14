@@ -8,6 +8,7 @@ import SignUp from './components/SignUp';
 import Contest from './components/Contest';
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 
+
 function App() {
   return (
     <BrowserRouter>
