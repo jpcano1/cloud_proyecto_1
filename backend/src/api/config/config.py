@@ -30,7 +30,6 @@ class ProductionConfig(Config):
     MAIL_USERNAME = os.getenv("EMAIL_USERNAME")
     MAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
     MAIL_USE_TLS = os.getenv("EMAIL_USE_TLS")
-    MAIL_USE_SSL = os.getenv("EMAIL_USE_SSL")
     MAIL_DEBUG = False
 
 class DevelopmentConfig(Config):
