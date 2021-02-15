@@ -9,6 +9,7 @@ services:
       dockerfile: compose/production/app/Dockerfile
     env_file:
       - env/production/app
+      - env/production/postgres
     ports:
       - 5000:5000
     command: /app/start
