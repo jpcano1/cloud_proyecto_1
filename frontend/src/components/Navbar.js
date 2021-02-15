@@ -17,6 +17,10 @@ export default function NavbarO(){
         }
     })
 
+    function logOut(){
+        Cookie.remove('access_token');
+    }
+
 
     return( 
         <Navbar bg="dark" variant="dark">
@@ -41,7 +45,7 @@ export default function NavbarO(){
         </div>
         <div  className="button-space">
         {isLogged
-        ? <Button variant="outline-info" href="/">Log Out</Button>
+        ? <Button variant="outline-info" href="/" onClick={() => logOut()}>Log Out</Button>
         : <Button variant="outline-info" href="/signup">Sign Up</Button>
         }
         </div>

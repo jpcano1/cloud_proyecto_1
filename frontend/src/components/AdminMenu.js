@@ -1,13 +1,13 @@
 import React, {useEffect, useState}from 'react'; 
 import {Button, Modal} from 'react-bootstrap';
-import {get_contests, post_contest, delete_contest,put_contest, upload_banner} from '../services/Contest';
+import {get_contests, post_contest, delete_contest,put_contest, upload_banner, get_contest_banner} from '../services/Contest';
 import DatePicker from "react-datepicker";
 
 
 export default function AdminMenu(){
     const [contests, setContest] = useState([]);
     const[contestSelected, setContestSelected] = useState([]); 
-
+    const urlBanner = "http://localhost:5000/";
     const[name, setName] = useState("");
     const[banner, setBanner] = useState([]); 
     const[url, setUrl] = useState(""); 
@@ -18,6 +18,7 @@ export default function AdminMenu(){
     const[recommendations, setRecommendations] = useState("");
     const[showCreateModal, setShowCreateModal] = useState(false);
     const[showEditModal, setShowEditModal] = useState(false);
+    const[images,setImage] = useState([]); 
     
     useEffect( ()  => {
         fetchContest()
@@ -28,6 +29,7 @@ export default function AdminMenu(){
         setContest(answer);
     }
 
+
     async function createContest(){
         let newContest = new Object(); 
         newContest.name = name;  
@@ -36,9 +38,11 @@ export default function AdminMenu(){
         newContest.end_date = end_date.getDate() + "/"+ end_date.getMonth() + "/"+ end_date.getFullYear();
         newContest.prize = prize; 
         newContest.script = script; 
-        newContest.recommendations = recommendations; 
+        newContest.recommendations = recommendations;
         let answer = await post_contest(newContest); 
-        fileUpload(answer.contest.id)
+        if(banner){
+          fileUpload(answer.contest.id)
+        }
         setShowCreateModal(false);
         fetchContest();
     }
@@ -56,6 +60,9 @@ export default function AdminMenu(){
 
         newContest.begin_date = begin_date.getDate() + "/"+ begin_date.getMonth() + "/"+ begin_date.getFullYear();
         newContest.end_date = end_date.getDate() + "/"+ end_date.getMonth() + "/"+ end_date.getFullYear();
+      if(banner){
+        await fileUpload(contestSelected.id)
+      }
       if(prize){
         newContest.prize = prize; 
       }
@@ -75,7 +82,7 @@ export default function AdminMenu(){
       console.log(banner);
       const fd = new FormData();
       fd.append('banner', banner); 
-      //await upload_banner(id, fd)
+      await upload_banner(id, fd)
     }
     return(
     <div className="container-fluid">
@@ -105,7 +112,7 @@ export default function AdminMenu(){
                     }
                     {contests.map(h => 
                       {return <div className="card m-2" style={{width: "18rem"}}>
-                        <img className="card-img-top" src="" alt={h.name}/>
+                        <img className="card-img-top" src={urlBanner+h.banner} alt={h.name}/>
                             <div className="card-body">
                                 <h5 className="card-title">{h.name}</h5>
                                 <Button className="m-1" variant="outline-danger" onClick={() => deleteContest(h.url)}>Delete</Button>
@@ -214,8 +221,7 @@ export default function AdminMenu(){
                 </div>
               </div>
             </Modal>
-
-
+                  
             <Modal show={showEditModal} idEvent={contestSelected} onHide={() => setShowEditModal(false)}>
               <div className="modal-content">
                 <div className="modal-header">
