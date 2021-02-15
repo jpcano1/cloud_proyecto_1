@@ -97,7 +97,8 @@ class VoiceDetail(Resource):
         :return: A 200 status code message
         """
         fetched = VoiceModel.query.filter_by(
-            id=voice_id, converted=True
+            id=voice_id,
+            converted=True
         ).first()
         # If it wasn't found, it returns a 404 status
         # code message.
