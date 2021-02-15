@@ -26,10 +26,10 @@ class Voice(Resource):
         prev_page = pagination.prev_num
         next_page = pagination.next_num
         value = {
-            "voices": results,
             "count": pagination.pages,
             "previous": request.path + f"?page={prev_page}" if prev_page else None,
-            "next": request.path + f"?page={next_page}" if next_page else None
+            "next": request.path + f"?page={next_page}" if next_page else None,
+            "voices": results,
         }
         return value
 
@@ -120,7 +120,8 @@ class VoiceDetail(Resource):
         # Fetches the voice, if it's not found,
         # it returns a 404 status code message
         fetched = VoiceModel.query.filter_by(
-            id=voice_id, converted=True
+            id=voice_id,
+            converted=True
         ).first()
 
         if not fetched:

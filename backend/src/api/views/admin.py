@@ -74,6 +74,7 @@ class Login(Resource):
             expires_delta=expires
         )
         return response_with(responses.SUCCESS_200, value={
+            "admin_id": current_user.id,
             "access_token": access_token,
             "message": f"Logged in as {current_user.name}"
         })
