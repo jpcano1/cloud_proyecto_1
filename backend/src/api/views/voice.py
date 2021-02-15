@@ -22,9 +22,15 @@ class Voice(Resource):
         if the voices we're already converted
         :return: A 200 status code message
         """
-        fetched = VoiceModel.query.filter_by(
-            converted=True
-        ).order_by(VoiceModel.created.desc())
+        if request.args.get("contest_id"):
+            fetched = VoiceModel.query.filter_by(
+                contest=request.args.get("contest_id"),
+                converted=True
+            ).order_by(VoiceModel.created.desc())
+        else:
+            fetched = VoiceModel.query.filter_by(
+                converted=True
+            ).order_by(VoiceModel.created.desc())
 
         voice_schema = VoiceSchema(many=True)
         voices = voice_schema.dump(fetched)
