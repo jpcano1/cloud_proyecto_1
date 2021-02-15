@@ -4,12 +4,7 @@ import Cookie from 'js-cookie';
 
 const url = "http://localhost:5000/api/contest"
 const urlBanner = "http://localhost:5000/api/banner"
-const urlBannerPhoto = "http://127.0.0.1:5000/"
 
-export async function get_contest_banner(filename){
-    let answer = await axios.get(urlBannerPhoto+filename); 
-    return answer.data; 
-}
 
 export async function get_contest_detail(id){
     let answer = await axios.get(url+"/"+id); 
