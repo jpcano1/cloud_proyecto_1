@@ -9,15 +9,15 @@ ADD requirements/prod.txt $APP_DIR
 ADD wsgi.py $APP_DIR
 
 # Run Commands
-ADD compose/development/app/start $APP_DIR
+ADD compose/production/app/start $APP_DIR
 RUN sed -i 's/\r//' $APP_DIR/start
 RUN chmod +x $APP_DIR/start
 
-ADD compose/development/celery/worker/start $APP_DIR/celery_worker_start
+ADD compose/production/celery/worker/start $APP_DIR/celery_worker_start
 RUN sed -i 's/\r//' $APP_DIR/celery_worker_start
 RUN chmod +x $APP_DIR/celery_worker_start
 
-ADD compose/development/celery/beat/start $APP_DIR/celery_beat_start
+ADD compose/production/celery/beat/start $APP_DIR/celery_beat_start
 RUN sed -i 's/\r//' $APP_DIR/celery_beat_start
 RUN chmod +x $APP_DIR/celery_beat_start
 
