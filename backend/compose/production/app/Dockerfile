@@ -35,5 +35,4 @@ RUN apt-get update && apt full-upgrade -y && \
         rm -rf /var/lib/apt/lists/*
 
 RUN pip install --upgrade pip
-RUN pip install -r dev.txt
 RUN pip install -r prod.txt
