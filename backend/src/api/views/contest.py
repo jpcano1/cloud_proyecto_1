@@ -4,7 +4,9 @@ from flask import request, current_app, url_for
 from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
+# Werkzeug utils
 from werkzeug.utils import secure_filename
+import werkzeug as werk
 
 # Util Imports
 from ..utils import responses, db, response_with
@@ -22,6 +24,11 @@ from ..controllers import ContestController
 
 class Contest(Resource):
     def get(self):
+        """
+
+        :return:
+        :rtype:
+        """
         if request.args.get("admin_id"):
             fetched = ContestModel.query.filter_by(
                 admin=request.args.get("admin_id")
@@ -36,6 +43,11 @@ class Contest(Resource):
 
     @jwt_required()
     def post(self):
+        """
+
+        :return:
+        :rtype:
+        """
         data = request.get_json()
         data["admin"] = get_jwt_identity()
         contest_schema = ContestSchema()
@@ -45,17 +57,14 @@ class Contest(Resource):
             result = contest_schema.dump(contest.create())
         except ValidationError as e:
             a = e.messages.keys()
-            return response_with(responses.MISSING_PARAMETERS_422, value={
-                "error_message": "Missing Fields: " + ", ".join(a)
-            })
+            return response_with(responses.MISSING_PARAMETERS_422,
+                                 error="Missing Fields: " + ", ".join(a))
         except IntegrityError:
-            return response_with(responses.INVALID_FIELD_NAME_SENT_422, value={
-                "error_message": "Url already exists"
-            })
+            return response_with(responses.INVALID_FIELD_NAME_SENT_422,
+                                 error="Url already exists")
         except Exception as e:
-            return response_with(responses.INVALID_INPUT_422, value={
-                "error_message": str(e)
-            })
+            return response_with(responses.INVALID_INPUT_422,
+                                 error=str(e))
         return response_with(responses.SUCCESS_200, value={
             "message": "Contest created",
             "contest": result
@@ -63,13 +72,19 @@ class Contest(Resource):
 
 class ContestDetail(Resource):
     def get(self, url):
+        """
+
+        :param url:
+        :type url:
+        :return:
+        :rtype:
+        """
         fetched = ContestModel.query.filter_by(
             url=url
         ).first()
         if not fetched:
-            return response_with(responses.SERVER_ERROR_404, value={
-                "error_message": "Resource does not exists"
-            })
+            return response_with(responses.SERVER_ERROR_404,
+                                 error="Resource does not exists")
         contest_schema = ContestSchema()
         contest = contest_schema.dump(fetched)
         return response_with(responses.SUCCESS_200, value={
@@ -78,14 +93,20 @@ class ContestDetail(Resource):
 
     @jwt_required()
     def put(self, url):
+        """
+
+        :param url:
+        :type url:
+        :return:
+        :rtype:
+        """
         admin_id = get_jwt_identity()
         contest = ContestModel.query.filter_by(
             url=url, admin=admin_id
         ).first()
         if not contest:
-            return response_with(responses.SERVER_ERROR_404, value={
-                "error_message": "Resource does not exists"
-            })
+            return response_with(responses.SERVER_ERROR_404,
+                                 error="Resource does not exists")
 
         data = request.get_json()
         if "name" in data:
@@ -115,14 +136,20 @@ class ContestDetail(Resource):
 
     @jwt_required()
     def delete(self, url):
+        """
+
+        :param url:
+        :type url:
+        :return:
+        :rtype:
+        """
         admin_id = get_jwt_identity()
         fetched = ContestModel.query.filter_by(
             url=url, admin=admin_id
         ).first()
         if not fetched:
-            return response_with(responses.SERVER_ERROR_404, value={
-                "error_message": "Resource does not exists"
-            })
+            return response_with(responses.SERVER_ERROR_404,
+                                 error="Resource does not exists")
         db.session.delete(fetched)
         db.session.commit()
         return response_with(responses.SUCCESS_204)
@@ -132,12 +159,22 @@ class BannerUpload(Resource):
 
     @jwt_required()
     def post(self, contest_id):
+        """
+
+        :param contest_id:
+        :type contest_id:
+        :return:
+        :rtype:
+        """
         admin_id = get_jwt_identity()
         fetched = ContestModel.query.filter_by(
             admin=admin_id, id=contest_id
         ).first()
         if fetched:
-            file = request.files.get("banner", None)
+            file: werk.FileStorage = request.files.get("banner", None)
+            if not self.contest_controller(file.content_type):
+                return response_with(responses.INVALID_INPUT_422,
+                                     error="File type not allowed")
             if file and self.contest_controller(file.content_type):
                 filename = secure_filename("_".join([
                     fetched.url,
@@ -149,9 +186,8 @@ class BannerUpload(Resource):
                     filename
                 ))
             else:
-                return response_with(responses.INVALID_INPUT_422, value={
-                    "message": "There is no file"
-                })
+                return response_with(responses.INVALID_INPUT_422,
+                                     error="There is no file")
             fetched.banner = url_for("upload_banner",
                                      filename=filename)
             db.session.add(fetched)

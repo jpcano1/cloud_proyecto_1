@@ -1,10 +1,20 @@
 def response_with(response, value=None,
-                  error=None, headers={}, pagination=None):
+                  error=None, headers={},
+                  pagination=None):
+    """
+    Function to send responses throughout the application
+    :param response: The response code and message
+    :param value: The value to be sent in the response body
+    :param error: The error produced by the logic in the views
+    :param headers: The headers of the response
+    :param pagination: The pagination index
+    :return: The response of the performed request of the user
+    """
     result = {}
-    if value is not None:
+    if value:
         result.update(value)
 
-    if response.get("message", None) is not None:
+    if response.get("message", None):
         result.update({
             "message": response["message"]
         })
@@ -13,12 +23,12 @@ def response_with(response, value=None,
         "code": response["code"]
     })
 
-    if error is not None:
+    if error:
         result.update({
             "errors": error
         })
 
-    if pagination is not None:
+    if pagination:
         result.update({
             "pagination": pagination
         })
@@ -32,6 +42,7 @@ def response_with(response, value=None,
 
     return result, response["status"], headers
 
+# Responses
 INVALID_FIELD_NAME_SENT_422 = {
     "status": 422,
     "code": "invalidField",
