@@ -72,5 +72,10 @@ class AdminSchema(ModelSchema):
     contests = fields.Nested(
         ContestSchema,
         many=True,
-        only=["name", "prize"]
+        only=[
+            "id",
+            "name",
+            "prize",
+            "banner"
+        ]
     )

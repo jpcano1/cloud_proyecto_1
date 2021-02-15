@@ -22,9 +22,14 @@ from ..controllers import ContestController
 
 class Contest(Resource):
     def get(self):
-        contests = ContestModel.query.all()
+        if request.args.get("admin_id"):
+            fetched = ContestModel.query.filter_by(
+                admin=request.args.get("admin_id")
+            ).all()
+        else:
+            fetched = ContestModel.query.all()
         contest_schema = ContestSchema(many=True)
-        contests = contest_schema.dump(contests)
+        contests = contest_schema.dump(fetched)
         return response_with(responses.SUCCESS_200, value={
             "contests": contests
         })
@@ -58,15 +63,15 @@ class Contest(Resource):
 
 class ContestDetail(Resource):
     def get(self, url):
-        contest = ContestModel.query.filter_by(
+        fetched = ContestModel.query.filter_by(
             url=url
         ).first()
-        if not contest:
+        if not fetched:
             return response_with(responses.SERVER_ERROR_404, value={
                 "error_message": "Resource does not exists"
             })
         contest_schema = ContestSchema()
-        contest = contest_schema.dump(contest)
+        contest = contest_schema.dump(fetched)
         return response_with(responses.SUCCESS_200, value={
             "contest": contest
         })
@@ -111,14 +116,14 @@ class ContestDetail(Resource):
     @jwt_required()
     def delete(self, url):
         admin_id = get_jwt_identity()
-        contest = ContestModel.query.filter_by(
+        fetched = ContestModel.query.filter_by(
             url=url, admin=admin_id
         ).first()
-        if not contest:
+        if not fetched:
             return response_with(responses.SERVER_ERROR_404, value={
                 "error_message": "Resource does not exists"
             })
-        db.session.delete(contest)
+        db.session.delete(fetched)
         db.session.commit()
         return response_with(responses.SUCCESS_204)
 
@@ -131,22 +136,22 @@ class BannerUpload(Resource):
         fetched = ContestModel.query.filter_by(
             admin=admin_id, id=contest_id
         ).first()
-        file = request.files.get("banner", None)
-        if file and self.contest_controller(file.content_type):
-            filename = secure_filename("_".join([
-                fetched.url,
-                file.filename
-            ]))
-            file.save(os.path.join(
-                "src",
-                current_app.config["BANNERS_FOLDER"],
-                filename
-            ))
-        else:
-            return response_with(responses.INVALID_INPUT_422, value={
-                "message": "There is no file"
-            })
         if fetched:
+            file = request.files.get("banner", None)
+            if file and self.contest_controller(file.content_type):
+                filename = secure_filename("_".join([
+                    fetched.url,
+                    file.filename
+                ]))
+                file.save(os.path.join(
+                    "src",
+                    current_app.config["BANNERS_FOLDER"],
+                    filename
+                ))
+            else:
+                return response_with(responses.INVALID_INPUT_422, value={
+                    "message": "There is no file"
+                })
             fetched.banner = url_for("upload_banner",
                                      filename=filename)
             db.session.add(fetched)
@@ -154,4 +159,4 @@ class BannerUpload(Resource):
             return response_with(responses.SUCCESS_200, value={
                 "message": "File Uploaded!"
             })
-        return response_with(responses.FORBIDDEN_403)
+        return response_with(responses.SERVER_ERROR_404)
