@@ -1,6 +1,19 @@
 version: "3"
 
+volumes:
+  local_postgres_data: {}
+  local_postgres_data_backups: {}
+
 services:
+  db:
+    image: postgres
+    container_name: cloud_db
+    volumes:
+      - local_postgres_data:/var/lib/postgresql/data
+      - local_postgres_data_backups:/backups
+    env_file:
+      - env/development/postgres
+
   app: &app
     container_name: cloud_app
     image: local_cloud_app
@@ -9,12 +22,15 @@ services:
       dockerfile: compose/development/app/Dockerfile
     env_file:
       - env/development/app
+      - env/development/postgres
     volumes:
       - ./wsgi.py:/app/wsgi.py
       - ./src:/app/src
     ports:
       - 5000:5000
     command: /app/start
+    depends_on:
+      - db
 
   celery_worker:
     <<: *app

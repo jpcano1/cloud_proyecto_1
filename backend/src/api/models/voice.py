@@ -9,7 +9,7 @@ class Voice(db.Model):
     name = db.Column(db.String(120), nullable=False)
     last_name = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), nullable=False)
-    audio = db.Column(db.String(20), default="")
+    audio = db.Column(db.String(255), default="")
     observations = db.Column(db.String(120), default="")
     converted = db.Column(db.Boolean, nullable=False, default=False)
     contest = db.Column(db.Integer, db.ForeignKey("contests.id"))

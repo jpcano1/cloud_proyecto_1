@@ -1,6 +1,4 @@
 -r dev.txt
 
-psycopg2
-psycopg2-binary
 wheel
 gunicorn

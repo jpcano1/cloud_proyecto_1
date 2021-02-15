@@ -3,7 +3,7 @@ from flask import Flask, send_from_directory
 from flask_bcrypt import Bcrypt
 from flask_restful import Api
 from flask_cors import CORS
-from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager, jwt_required
 
 # App Configurations
 from src.api.config import (DevelopmentConfig,
@@ -90,6 +90,11 @@ def upload_banner(filename):
     :return: The url of the saved banner
     """
     return send_from_directory(app.config["BANNERS_FOLDER"], filename)
+
+@app.route("/")
+@jwt_required()
+def hola():
+    return "Hola"
 
 # Admin Routes
 api.add_resource(SignUp, "/api/signup")

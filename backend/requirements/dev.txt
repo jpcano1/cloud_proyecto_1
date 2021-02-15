@@ -13,3 +13,5 @@ flask-restful
 flask-bcrypt
 flask-cors
 celery[redis]
+psycopg2
+psycopg2-binary

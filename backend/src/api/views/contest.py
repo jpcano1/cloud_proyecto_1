@@ -29,7 +29,7 @@ class Contest(Resource):
             "contests": contests
         })
 
-    @jwt_required
+    @jwt_required()
     def post(self):
         data = request.get_json()
         data["admin"] = get_jwt_identity()
@@ -71,7 +71,7 @@ class ContestDetail(Resource):
             "contest": contest
         })
 
-    @jwt_required
+    @jwt_required()
     def put(self, url):
         admin_id = get_jwt_identity()
         contest = ContestModel.query.filter_by(
@@ -108,7 +108,7 @@ class ContestDetail(Resource):
             "event": contest
         })
 
-    @jwt_required
+    @jwt_required()
     def delete(self, url):
         admin_id = get_jwt_identity()
         contest = ContestModel.query.filter_by(
@@ -125,7 +125,7 @@ class ContestDetail(Resource):
 class BannerUpload(Resource):
     contest_controller = ContestController()
 
-    @jwt_required
+    @jwt_required()
     def post(self, contest_id):
         admin_id = get_jwt_identity()
         fetched = ContestModel.query.filter_by(
