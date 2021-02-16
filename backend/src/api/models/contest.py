@@ -13,13 +13,13 @@ class Contest(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(120), nullable=False)
-    banner = db.Column(db.String(20), default="")
-    url = db.Column(db.String(50), nullable=False, unique=True)
+    banner = db.Column(db.String(255), default="")
+    url = db.Column(db.String(255), nullable=False, unique=True)
     begin_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
     prize = db.Column(db.Float, nullable=False)
-    script = db.Column(db.String(120), nullable=False)
-    recommendations = db.Column(db.String(120), default="")
+    script = db.Column(db.String(255), nullable=False)
+    recommendations = db.Column(db.String(255), default="")
     admin = db.Column(db.Integer, db.ForeignKey("admins.id"))
     voices = db.relationship("Voice", backref="Contest", cascade="all, delete-orphan")
 
