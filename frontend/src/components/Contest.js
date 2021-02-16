@@ -6,6 +6,7 @@ import {Button, Modal} from 'react-bootstrap';
 import Pagination from '@material-ui/lab/Pagination';
 import '../css/Contest.css';
 import configData from '../config.json';
+import Cookie from 'js-cookie';
 
 
 export default function Contest(props){
@@ -23,10 +24,14 @@ export default function Contest(props){
     const[observations, setObservations] = useState([]);
     const[audios,setAudios] = useState([]);
 
-    const[pages,setPages] = useState(0); 
+    const[pages,setPages] = useState(0);
+    const[isLogged, setIsLogged] = useState(false); 
 
     useEffect(async () =>{
         let answer = await get_contest_detail(props.match.params.url)
+        if(Cookie.get("access_token")){
+          setIsLogged(true);
+        }
         setContest(answer.contest); 
         fetchAudios();
     },[contest.id])
@@ -39,7 +44,12 @@ export default function Contest(props){
     }
     async function fetchAudios(page=1){
       let answer = await get_voices(contest.id,page); 
-      setAudios(answer.voices);
+      if(!isLogged){
+        setAudios(answer.voices.filter((d) => d.converted=="true"));
+      }
+      else{
+        setAudios(answer.voices);
+      }
       setPages(answer.count);
     }
     async function createVoice(){
@@ -104,14 +114,21 @@ export default function Contest(props){
                     {audios.sort((a, b) => new Date(b.created) - new Date(a.date)).map(h => 
                       {return <div className="card m-2" style={{width: "18rem"}}>
                             <div className="card-body">
-                                <h5 className="card-title">{h.name}</h5>
+                                <h5 className="card-title">{h.name +" "+ h.last_name}</h5>
                                 <h6>{h.email}</h6>
+                                <h6>Raw Audio</h6>
+                                {isLogged && <div className="container-fluid">
+                                              <audio className="audio-style" src={urlAudio+h.raw_audio} controls>
+                                                Your browser does not support the <code>audio</code> element.
+                                              </audio>
+                                            </div>}
+                                <h6>Converted Audio</h6>
                                 <div className="container-fluid">
-                                  <audio className="audio-style" src={urlAudio+h.audio} controls>
+                                  <audio className="audio-style" src={urlAudio+h.converted_audio} controls>
                                     Your browser does not support the <code>audio</code> element.
                                   </audio>
                                 </div>
-                                <h6>Converted: {h.converted=="true"? "In process":"Converted"}</h6>
+                                {isLogged && <h6>Converted: {h.converted=="true"? "Converted":"In Process"}</h6>}
 
                             </div>
                             <div className="card-footer">

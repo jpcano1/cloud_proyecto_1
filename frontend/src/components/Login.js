@@ -3,7 +3,9 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import {post_login} from '../services/User';
 import { useHistory, Link } from "react-router-dom";
-import '../css/LoginCss.css'
+import '../css/LoginCss.css'; 
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
 
 export default function Login(){
     const history = useHistory();
@@ -21,7 +23,7 @@ export default function Login(){
       history.push({pathname:"/contest", state: { admin: answer }});
     }
     return(
-        <div className="Login justify-content-center center text-center col-4">
+        <div className="Login justify-content-center center  col-4">
         <Form onSubmit={handleSubmit}>
         <Form.Group size="lg" controlId="email">
           <Form.Label>Email</Form.Label>

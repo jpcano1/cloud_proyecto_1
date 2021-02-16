@@ -1,7 +1,8 @@
 import axios from "axios";
 import Cookie from "js-cookie";
+import configData from '../config.json';
 
-const url = "http://localhost:5000/api"
+const url = configData.BACKEND_URL+"api";
 
 export async function post_login(data){
     try{
@@ -11,7 +12,7 @@ export async function post_login(data){
         return answer.data.admin_id
     }
     catch (error) {
-        // Error 😨
+        // Error 
         if (error.response) {
             /*
              * The request was made and the server responded with a
