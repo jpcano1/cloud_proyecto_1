@@ -146,7 +146,7 @@ class VoiceUpload(Resource):
         # This is the file from the form-data
         file: werk.FileStorage = request.files.get("audio", None)
         # If it was submitted, save it
-        if fetched and not fetched.audio == "":
+        if fetched and fetched.audio == "":
             # Controller stage of the voice file
             if file and not self.voice_controller(file.content_type):
                 return response_with(responses.INVALID_INPUT_422,
