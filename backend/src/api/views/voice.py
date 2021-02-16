@@ -131,7 +131,7 @@ class VoiceUpload(Resource):
         # This is the file from the form-data
         file: werk.FileStorage = request.files.get("audio", None)
         # If it was submitted, save it
-        if fetched and fetched.audio == "":
+        if fetched and fetched.raw_audio == "":
             # Controller stage of the voice file
             if file and not self.voice_controller(file.content_type):
                 return response_with(responses.INVALID_INPUT_422,
@@ -154,7 +154,7 @@ class VoiceUpload(Resource):
             # To the saved audio, defines the url to find it
             # the url is defined w.r.t the function defined
             # in the app.py
-            fetched.audio = url_for("upload_raw_audio",
+            fetched.raw_audio = url_for("upload_raw_audio",
                                     filename=filename,
                                     _external=False)
             db.session.add(fetched)

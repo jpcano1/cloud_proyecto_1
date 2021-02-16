@@ -42,10 +42,10 @@ def converter():
 
     counter = 0
     for voice in fetched_voices:
-        if voice.audio:
-            path = convert(voice.audio)
+        if voice.raw_audio:
+            path = convert(voice.raw_audio)
             voice.converted = True
-            voice.audio = path
+            voice.converted_audio = path
             db.session.add(voice)
             db.session.commit()
             print(f"Voice: {voice.id} converted")
