@@ -42,13 +42,10 @@ class Voice(Resource):
         page = request.args.get("page", 1, type=int)
         if request.args.get("contest_id"):
             fetched = VoiceModel.query.filter_by(
-                contest=request.args.get("contest_id"),
-                converted=True
+                contest=request.args.get("contest_id")
             )
         else:
-            fetched = VoiceModel.query.filter_by(
-                converted=True
-            )
+            fetched = VoiceModel.query
 
         fetched = fetched.order_by(
             VoiceModel.created.desc()
@@ -96,16 +93,7 @@ class VoiceDetail(Resource):
         :param voice_id: The id of the voice
         :return: A 200 status code message
         """
-        fetched = VoiceModel.query.filter_by(
-            id=voice_id,
-            converted=True
-        ).first()
-        # If it wasn't found, it returns a 404 status
-        # code message.
-        if not fetched:
-            return response_with(responses.SERVER_ERROR_404, value={
-                "error_message": "Resource does not exist or it hasn't been converted"
-            })
+        fetched = VoiceModel.query.get_or_404(voice_id)
         voice_schema = VoiceSchema()
         voice = voice_schema.dump(fetched)
         return response_with(responses.SUCCESS_200, value={
@@ -120,10 +108,7 @@ class VoiceDetail(Resource):
         """
         # Fetches the voice, if it's not found,
         # it returns a 404 status code message
-        fetched = VoiceModel.query.filter_by(
-            id=voice_id,
-            converted=True
-        ).first()
+        fetched = VoiceModel.query.get_or_404(voice_id)
 
         if not fetched:
             return response_with(responses.SERVER_ERROR_404, value={
