@@ -41,8 +41,13 @@ export async function put_contest(data){
     return answer.data; 
 }
 
-export async function get_contests(id){
+export async function get_contests_admin(id){
     let answer =  await axios.get(url,{ params: { admin_id: id }});
     let contestArray = answer.data.contests;
     return contestArray
+}
+export async function get_contests(){
+    let answer =  await axios.get(url);
+    let contestArray = answer.data.contests;
+    return contestArray;
 }

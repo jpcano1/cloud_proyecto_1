@@ -1,20 +1,35 @@
-import React from 'react'
+import React,{useState,useEffect} from 'react'
 import { makeStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
+import {Button} from 'react-bootstrap';
 import { Carousel } from 'react-bootstrap';
 import Carousel1 from '../images/Carousel 1.jpg';
 import Carousel2 from '../images/Carousel 2.jpg';
 import Logo from '../images/Logo SuperVoices.png';
+import {get_contests} from '../services/Contest';
+import '../css/Lading.css';
+import configData from '../config.json';
 
 export default function Landing(){
 
+
+    //URL for request banners
+    const urlBanner = configData.BACKEND_URL;
     // var pad = {
     //     paddingHorizontal: 100
     // }
+    const[contests, setContests] = useState([]); 
+    useEffect(() => {
+      fetchContests();
 
+    },[]);
+
+    async function fetchContests(){
+      let answer = await get_contests();
+      setContests(answer);
+    }
     return(<div
-        className = "mx-auto"
-        style = {{paddingLeft : 175,  paddingRight: 175}}
+        className = "carrusel-container"
+        style = {{paddingLeft : 0,  paddingRight: 0}}
     >
 
         <Carousel>
@@ -22,8 +37,8 @@ export default function Landing(){
     <img
       src={Carousel1}
       alt="First slide"
-      width= "95%"
-      className = "rounded mx-auto d-block"
+      width= "100%"
+      className = "rounded d-block carrusel-container"
     />
 
     <Carousel.Caption>
@@ -35,8 +50,8 @@ export default function Landing(){
     <img
       src={Carousel2}
       alt="Second slide"
-      width= "95%"
-      className = "rounded mx-auto d-block"
+      width= "100%"
+      className = "rounded d-block carrusel-container"
     />
     <Carousel.Caption>
       <h3>Por qué elegirnos</h3>
@@ -44,5 +59,23 @@ export default function Landing(){
     </Carousel.Caption>
   </Carousel.Item>
 </Carousel>
-    </div>)
+    <h3 className="m-2">Active Contests:</h3>
+    <div className="row m-2">
+    {contests.map(h => 
+                      {return <div className="card m-2" style={{width: "18rem"}}>
+                        <div>
+                              <img className="card-img-top img-fluid img-size" src={urlBanner+h.banner} alt={h.name}/>
+                        </div>
+                        
+                            <div className="card-body">
+                                <h5 className="card-title">{h.name}</h5>
+                                <Button className="m-1" variant="outline-info" href={'/contest/' + h.url}>Details</Button>
+                            </div>
+                        </div>})}
+
+
+    </div>
+    
+
+  </div>)
 }

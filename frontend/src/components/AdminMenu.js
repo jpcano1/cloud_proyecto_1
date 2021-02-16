@@ -1,16 +1,18 @@
 import React, {useEffect, useState}from 'react'; 
 import {Button, Modal} from 'react-bootstrap';
-import {get_contests, post_contest, delete_contest,put_contest, upload_banner} from '../services/Contest';
-import DatePicker from "react-datepicker";
+import {get_contests_admin, post_contest, delete_contest,put_contest, upload_banner} from '../services/Contest';
 import configData from '../config.json';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 
 
 export default function AdminMenu(props){
+    //URL for request banners
+    const urlBanner = configData.BACKEND_URL;
+    //Contest and Selected Contest
     const [contests, setContest] = useState([]);
     const[contestSelected, setContestSelected] = useState([]); 
-    const urlBanner = configData.BACKEND_URL;
+    //Atributtes for Contest
     const[name, setName] = useState("");
     const[banner, setBanner] = useState(""); 
     const[url, setUrl] = useState(""); 
@@ -19,17 +21,28 @@ export default function AdminMenu(props){
     const[prize, setPrize] = useState(""); 
     const[script, setScript] = useState("");
     const[recommendations, setRecommendations] = useState("");
+    //Modals
     const[showCreateModal, setShowCreateModal] = useState(false);
     const[showEditModal, setShowEditModal] = useState(false);
     const[showDeleteModal, setShowDeleteModal] = useState(false);
+    //Message and Snackbar to handle error messages  
+    const[message, setMessage] = useState("Something went wrong, ups");
+    const[errorModal, setErrorModal] = useState(false);
     
     useEffect( ()  => {
         fetchContest(props.location.state.admin)
     },[contests.length])
 
      async function fetchContest(id){
-        let answer = await get_contests(id);
+        let answer = await get_contests_admin(id);
         setContest(answer);
+    }
+    function handleClose (event, reason){
+      if (reason === 'clickaway') {
+        return;
+      }
+  
+      setErrorModal(false);
     }
 
 
@@ -42,12 +55,29 @@ export default function AdminMenu(props){
         newContest.prize = prize; 
         newContest.script = script; 
         newContest.recommendations = recommendations;
-        let answer = await post_contest(newContest); 
-        if(banner){
-          fileUpload(answer.contest.id)
+
+        try{
+          let answer = await post_contest(newContest);
+          if(banner){
+            fileUpload(answer.contest.id)
+          }
+          setShowCreateModal(false);
+          fetchContest(); 
         }
-        setShowCreateModal(false);
-        fetchContest();
+        catch(error){
+            if (error.response) {
+              /*
+              * The request was made and the server responded with a
+              * status code that falls out of the range of 2xx
+              */
+              setMessage(error.response.data.errors);
+              setErrorModal(true);
+          } 
+          else{
+              setMessage(error.message)
+              setErrorModal(true);
+          }
+        }
     }
     
     async function deleteContest(url){
@@ -76,9 +106,25 @@ export default function AdminMenu(props){
         newContest.recommendations = recommendations; 
 
       }
-        let answer = await put_contest(newContest); 
-        setShowEditModal(false);
-        fetchContest();
+      try{
+          await put_contest(newContest); 
+          setShowEditModal(false);
+          fetchContest();
+      }
+      catch(error){
+        if (error.response) {
+          /*
+          * The request was made and the server responded with a
+          * status code that falls out of the range of 2xx
+          */
+          setMessage(error.response.data.errors);
+          setErrorModal(true);
+      } 
+      else{
+          setMessage(error.message)
+          setErrorModal(true);
+      }
+      }
     }
     async function fileUpload(id){
       const fd = new FormData();
@@ -113,7 +159,7 @@ export default function AdminMenu(props){
                     }
                     {contests.map(h => 
                       {return <div className="card m-2" style={{width: "18rem"}}>
-                        <img className="card-img-top img-fluid" src={urlBanner+h.banner} alt={h.name}/>
+                        <img className="card-img-top img-fluid img-size" src={urlBanner+h.banner} alt={h.name}/>
                             <div className="card-body">
                                 <h5 className="card-title">{h.name}</h5>
                                 <Button className="m-1" variant="outline-danger" onClick={() => {
@@ -132,7 +178,7 @@ export default function AdminMenu(props){
         <Modal show={showCreateModal} idEvent={contestSelected} onHide={() => setShowCreateModal(false)}>
               <div className="modal-content">
                 <div className="modal-header">
-                  <h5 className="modal-title" id="addProductModalLabel">
+                  <h5 className="modal-title" id="addCreateContest">
                     Create a Contest
               </h5>
                   <button
@@ -159,14 +205,16 @@ export default function AdminMenu(props){
                     <div className="form-group">
                       <label htmlfor="inputType">Banner</label>
                       <input
+                        id="inputBanner"
                         type="file"
                         className="form-control-file"
                         onChange={(e) => setBanner(e.target.files[0])}
                       />
                     </div>
                     <div className="form-group">
-                      <label htmlfor="inputQuantity">Url</label>
+                      <label htmlfor="inputUrl">Url</label>
                       <input
+                        id="inputUrl"
                         type="text"
                         className="form-control"
                         onChange={(e) => setUrl(e.target.value)}
@@ -174,11 +222,21 @@ export default function AdminMenu(props){
                     </div>
                     <div className="form-group">
                       <label htmlfor="inputPrice">Begin Date</label>
-                      <DatePicker selected={begin_date} onChange={date => setBegin_date(date)} dateFormat="yyyy/MM/dd" />
+                      <input
+                      id="inputBeginDate"
+                      type="date"
+                      className="form-control"
+                      onChange={date => setBegin_date(new Date(date.target.value))}
+                      />
                     </div>
                     <div className="form-group">
                       <label htmlfor="inputPrice">End  Date</label>
-                      <DatePicker selected={end_date} onChange={date => setEnd_date(date)} dateFormat="yyyy/MM/dd" />
+                      <input
+                      id="inputEndDate"
+                      type="date"
+                      className="form-control"
+                      onChange={date => setEnd_date(new Date(date.target.value))}
+                      />
                     </div>
                     <div className="form-group">
                       <label htmlfor="inputPrice">Prize</label>
@@ -273,11 +331,21 @@ export default function AdminMenu(props){
                     </div>
                     <div className="form-group">
                       <label htmlfor="inputPrice">Begin Date</label>
-                      <DatePicker selected={begin_date} onChange={date => setBegin_date(date)} dateFormat="yyyy/MM/dd" />
+                      <input
+                      id="inputBeginDate"
+                      type="date"
+                      className="form-control"
+                      onChange={date => setBegin_date(new Date(date.target.value))}
+                      />
                     </div>
                     <div className="form-group">
                       <label htmlfor="inputPrice">End  Date</label>
-                      <DatePicker selected={end_date} onChange={date => setEnd_date(date)} dateFormat="yyyy/MM/dd" />
+                      <input
+                      id="inputEndDate"
+                      type="date"
+                      className="form-control"
+                      onChange={date => setEnd_date(new Date(date.target.value))}
+                      />
                     </div>
                     <div className="form-group">
                       <label htmlfor="inputPrice">Prize</label>
@@ -327,6 +395,7 @@ export default function AdminMenu(props){
                 </div>
               </div>
             </Modal>
+            
             <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
               <div className="modal-content">
                 <div className="modal-header">
@@ -363,5 +432,10 @@ export default function AdminMenu(props){
                 </div>
               </div>
             </Modal>
+            <Snackbar open={errorModal} autoHideDuration={6000} onClose={handleClose}>
+                <MuiAlert onClose={handleClose} severity="error">
+                  {message}
+                </MuiAlert>
+            </Snackbar>
     </div>)
 }

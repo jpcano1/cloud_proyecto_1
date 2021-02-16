@@ -1,3 +1,26 @@
 .audio-style{
     width: 250px; 
 }
+
+.image-container{
+    position: relative;
+    text-align: center;
+    width: 100%;
+    margin: 0 0 0 0;
+}
+.image-contest{
+    height: 200px;
+    width: 100%;
+    filter: brightness(30%);
+}
+.contest-title{
+  position: absolute;
+  color:white;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.img-size{
+    max-height: 200px;
+}

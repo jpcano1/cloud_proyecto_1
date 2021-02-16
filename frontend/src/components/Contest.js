@@ -9,6 +9,7 @@ import configData from '../config.json';
 import Cookie from 'js-cookie';
 
 
+
 export default function Contest(props){
     const[contest, setContest] = useState([]);
 
@@ -73,29 +74,34 @@ export default function Contest(props){
     }
 
     return(<div className="container-fluid">
-        <div className="row justify-content-center">
-            <div className="col-sm-auto">
+        <div className="row justify-content-center image-container">
+          <img src={urlAudio + contest.banner} alt={contest.name} className="image-contest"></img>
+            <div className="col-sm-auto contest-title">
                 <h1>Contest: {contest.name}</h1>
             </div>
         </div>
-        <div className= "container-fluid row justify-content-center">
+        <div className= "container-fluid row justify-content-center mt-2">
             <div className="col-sm-6">
-                <div className="row">
+                <div className="row justify-content-center">
+                  <div className="d-flex flex-column">
                     <h4>Prize: {contest.prize} $</h4>
-                </div>
-                <div className="row">
                     <h4>End Date: {contest.end_date}</h4>
+                    <h4>Begin Date: {contest.begin_date}</h4>
+                  </div>  
                 </div>
-                <div className="row">
-                     <h4>Begin Date: {contest.begin_date}</h4>
-                </div>
+
             </div>
             <div className="col-sm-6">
-                <div className="row">
-                    <h4>Script: {contest.script}</h4>
+                <div className="row justify-content-center">
+                    <div className="d-flex flex-column">
+                      <h4>Script: {contest.script}</h4>
+                      <h4>Recommendations: {contest.recommendations}</h4>
+
+                    </div>
+                    
                 </div>
-                <div className="row">
-                    <h4>Recommendations: {contest.recommendations}</h4>
+                <div className="row justify-content-center">
+                    
                 </div>
             </div>
         </div>
