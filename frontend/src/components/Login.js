@@ -17,8 +17,8 @@ export default function Login(){
     async function handleSubmit(event) {
       event.preventDefault();
       let data = {"email": email, "password":password}; 
-      let respuest = await post_login(data);
-      history.push("/contest");
+      let answer = await post_login(data);
+      history.push({pathname:"/contest", state: { admin: answer }});
     }
     return(
         <div className="Login justify-content-center center text-center col-4">

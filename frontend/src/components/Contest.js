@@ -4,13 +4,16 @@ import {get_contest_detail} from '../services/Contest';
 import {post_voice,upload_voice,get_voices} from '../services/Voice';
 import {Button, Modal} from 'react-bootstrap';
 import Pagination from '@material-ui/lab/Pagination';
+import '../css/Contest.css';
+import configData from '../config.json';
 
 
 export default function Contest(props){
     const[contest, setContest] = useState([]);
 
     const[showModalUpload,setShowModalUpload ] = useState(false);
-
+    const[showModalNotify,setShowModalNotify] = useState(false);
+    const urlAudio = configData.BACKEND_URL;
     const[voiceSelected, setVoiceSelected] = useState([]);
 
     const[name, setName] = useState([]);
@@ -20,23 +23,24 @@ export default function Contest(props){
     const[observations, setObservations] = useState([]);
     const[audios,setAudios] = useState([]);
 
-    const[minValue,setMinValue] = useState(0); 
-    const[maxValue,setMaxValue] = useState(50); 
+    const[pages,setPages] = useState(0); 
 
     useEffect(async () =>{
         let answer = await get_contest_detail(props.match.params.url)
         setContest(answer.contest); 
-        answer = await get_voices(); 
-        setAudios(answer);
+        fetchAudios();
     },[contest.id])
 
     function validateForm(){
         return email.length > 0 && name.length > 0 & lastName.length > 0 && voice
     }
     function handlePagination(event, value){
-        console.log(value); 
-        setMinValue(maxValue); 
-        setMaxValue(value*50);
+         fetchAudios(value);
+    }
+    async function fetchAudios(page=1){
+      let answer = await get_voices(contest.id,page); 
+      setAudios(answer.voices);
+      setPages(answer.count);
     }
     async function createVoice(){
         let newVoice = new Object(); 
@@ -45,10 +49,11 @@ export default function Contest(props){
         newVoice.email = email; 
         newVoice.observations = observations;
         newVoice.contest = contest.id;
-        console.log(newVoice);
         let answer = await post_voice(newVoice); 
         await uploadVoice(answer.id)
+        await fetchAudios();
         setShowModalUpload(false);
+        setShowModalNotify(true);
     }
     async function uploadVoice(id){
         const fd = new FormData();
@@ -96,10 +101,18 @@ export default function Contest(props){
                     {audios.length == 0 && 
                     <h4>Nobody has participated </h4>
                     }
-                    {audios.slice(minValue, maxValue).map(h => 
+                    {audios.sort((a, b) => new Date(b.created) - new Date(a.date)).map(h => 
                       {return <div className="card m-2" style={{width: "18rem"}}>
                             <div className="card-body">
                                 <h5 className="card-title">{h.name}</h5>
+                                <h6>{h.email}</h6>
+                                <div className="container-fluid">
+                                  <audio className="audio-style" src={urlAudio+h.audio} controls>
+                                    Your browser does not support the <code>audio</code> element.
+                                  </audio>
+                                </div>
+                                <h6>Converted: {h.converted=="true"? "In process":"Converted"}</h6>
+
                             </div>
                             <div className="card-footer">
                                 <h5 >{h.observations}</h5>
@@ -108,10 +121,10 @@ export default function Contest(props){
         </div> 
         <div className="row justify-content-center">
                     <Pagination
-                        variant="outlined" color="primary"
+                        color="primary"
                         defaultCurrent={1}
                         onChange={handlePagination}
-                        count={audios.length}
+                        count={pages}
                     />
          </div>
         
@@ -201,7 +214,41 @@ export default function Contest(props){
               </div>
             </Modal>
 
-
+            <Modal show={showModalNotify} onHide={() => setShowModalNotify(false)}>
+              <div className="modal-content">
+                <div className="modal-header">
+                    <h5 className="modal-title" id="addProductModalLabel">
+                      We have received your voice!
+                    </h5>
+                    <button
+                        type="button"
+                        className="close"
+                        data-dismiss="modal"
+                        aria-label="Close"
+                        onClick={() => setShowModalNotify(false)}
+                    >
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div className="modal-body">
+                 <p>We have received your voice and are processing 
+                   it to be published. Once processed, it will be displayed on 
+                   the contest page and subsequently reviewed by our work team. 
+                   As soon as the voice is published on the contest page we will notify you by email
+                  </p>
+                </div>
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-success"
+                    data-dismiss="modal"
+                    onClick={() => setShowModalNotify(false)}
+                  >
+                    OK
+              </button>
+                </div>
+              </div>
+            </Modal>
     </div>
     )
 

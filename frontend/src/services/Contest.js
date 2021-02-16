@@ -1,9 +1,9 @@
 import axios from "axios";
 import Cookie from 'js-cookie';
+import configData from '../config.json';
 
-
-const url = "http://localhost:5000/api/contest"
-const urlBanner = "http://localhost:5000/api/banner"
+const url = configData.BACKEND_URL+"api/contest"
+const urlBanner = configData.BACKEND_URL+"/api/banner"
 
 
 export async function get_contest_detail(id){
@@ -38,13 +38,11 @@ export async function put_contest(data){
     'Bearer ' + Cookie.get("access_token");
     let urltemp = url+"/"+data.url; 
     let answer = await axios.put(urltemp, data);
-
-    console.log(answer);
     return answer.data; 
 }
 
-export async function get_contests(){
-    let answer =  await axios.get(url);
+export async function get_contests(id){
+    let answer =  await axios.get(url,{ params: { admin_id: id }});
     let contestArray = answer.data.contests;
     return contestArray
 }
