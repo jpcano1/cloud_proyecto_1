@@ -29,6 +29,7 @@ RUN apt-get update && apt full-upgrade -y && \
         tzdata \
         git \
         ffmpeg \
+        vim \
         && \
         apt-get clean && \
         rm -rf /var/lib/apt/lists/*
