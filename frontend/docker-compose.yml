@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  app:
+    container_name: cloud_app_frontend
+    image: prod_cloud_app_frontend
+    ports:
+      - 3000:3000
+    build:
+      dockerfile: compose/Dockerfile
+      context: .
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+      - ./package.json:/app/package.json
+    command: /app/start
