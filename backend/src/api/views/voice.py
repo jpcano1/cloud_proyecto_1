@@ -146,12 +146,12 @@ class VoiceUpload(Resource):
         # This is the file from the form-data
         file: werk.FileStorage = request.files.get("audio", None)
         # If it was submitted, save it
-        if fetched:
+        if fetched and not fetched.audio == "":
             # Controller stage of the voice file
-            if not self.voice_controller(file.content_type):
+            if file and not self.voice_controller(file.content_type):
                 return response_with(responses.INVALID_INPUT_422,
                                      error="File type not allowed")
-            if file and self.voice_controller(file.content_type):
+            elif file and self.voice_controller(file.content_type):
                 filename = secure_filename("_".join([
                     str(fetched.id), fetched.name,
                     fetched.last_name, file.filename
@@ -178,4 +178,5 @@ class VoiceUpload(Resource):
                 "message": "Audio Uploaded!"
             })
 
-        return response_with(responses.SERVER_ERROR_404)
+        return response_with(responses.FORBIDDEN_403,
+                             error="Voice already has audio file or it doesn't exist")
