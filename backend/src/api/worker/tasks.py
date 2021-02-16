@@ -26,7 +26,11 @@ def notify_converted(name, email):
 def convert(audio_url):
     full_path = audio_url[1:]
     audio_name = full_path.split("/")[-1]
-    converted_path = "src/static/converted_audios/" + audio_name + ".mp3"
+    if audio_name.endswith(".mp3"):
+        converted_path = "src/static/converted_audios/" + audio_name
+    else:
+        converted_path = "src/static/converted_audios/" + audio_name + ".mp3"
+
     if not os.path.exists(converted_path):
         print(f"Converting {full_path} to {converted_path}")
         os.system(f"ffmpeg -i {full_path} {converted_path}")
