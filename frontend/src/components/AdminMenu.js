@@ -1,14 +1,15 @@
 import React, {useEffect, useState}from 'react'; 
 import {Button, Modal} from 'react-bootstrap';
 import {get_contests_admin, post_contest, delete_contest,put_contest, upload_banner} from '../services/Contest';
-import configData from '../config.json';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
+import Cookie from 'js-cookie';
+import { useHistory } from "react-router-dom";
 
 
-export default function AdminMenu(props){
+export default function AdminMenu(){
     //URL for request banners
-    const urlBanner = configData.BACKEND_URL;
+    const urlBanner = process.env.REACT_APP_API_URL+ process.env.REACT_APP_PORT;
     //Contest and Selected Contest
     const [contests, setContest] = useState([]);
     const[contestSelected, setContestSelected] = useState([]); 
@@ -28,13 +29,18 @@ export default function AdminMenu(props){
     //Message and Snackbar to handle error messages  
     const[message, setMessage] = useState("Something went wrong, ups");
     const[errorModal, setErrorModal] = useState(false);
+    //Manage redirects
+    const history = useHistory();
     
     useEffect( ()  => {
-        fetchContest(props.location.state.admin)
+        fetchContest()
     },[contests.length])
 
-     async function fetchContest(id){
-        let answer = await get_contests_admin(id);
+     async function fetchContest(){
+       if(Cookie.get('admin')===undefined){
+        history.push("/login");
+       }
+        let answer = await get_contests_admin(Cookie.get('admin'));
         setContest(answer);
     }
     function handleClose (event, reason){
@@ -81,7 +87,8 @@ export default function AdminMenu(props){
     }
     
     async function deleteContest(url){
-      await delete_contest(url)
+      await delete_contest(url);
+      setShowDeleteModal(false);
       fetchContest();
     }
     async function editContest(){

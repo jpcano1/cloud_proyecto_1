@@ -15,10 +15,11 @@ export default function NavbarO(){
         if(token){
             setLogged(true)
         }
-    },[isLogged])
+    },[])
 
     function logOut(){
         Cookie.remove('access_token');
+        Cookie.remove('admin');
     }
 
 
@@ -35,6 +36,7 @@ export default function NavbarO(){
             </Navbar.Brand>
         <Navbar.Brand href="/">SuperVoices</Navbar.Brand>
         <Nav className="mr-auto">
+            {isLogged && <Link to="/contest" >My Contests</Link>}
         </Nav>
         <div className="button-space">
         {isLogged? <Button variant="outline-info" href="/">Home</Button>

@@ -5,7 +5,7 @@ import {post_voice,upload_voice,get_voices} from '../services/Voice';
 import {Button, Modal} from 'react-bootstrap';
 import Pagination from '@material-ui/lab/Pagination';
 import '../css/Contest.css';
-import configData from '../config.json';
+
 import Cookie from 'js-cookie';
 
 
@@ -15,8 +15,8 @@ export default function Contest(props){
 
     const[showModalUpload,setShowModalUpload ] = useState(false);
     const[showModalNotify,setShowModalNotify] = useState(false);
-    const urlAudio = configData.BACKEND_URL;
-    const[voiceSelected, setVoiceSelected] = useState([]);
+    const urlAudio = process.env.REACT_APP_API_URL+ process.env.REACT_APP_PORT;
+
 
     const[name, setName] = useState([]);
     const[lastName, setLastName] = useState([]);
@@ -85,8 +85,8 @@ export default function Contest(props){
                 <div className="row justify-content-center">
                   <div className="d-flex flex-column">
                     <h4>Prize: {contest.prize} $</h4>
-                    <h4>End Date: {contest.end_date}</h4>
                     <h4>Begin Date: {contest.begin_date}</h4>
+                    <h4>End Date: {contest.end_date}</h4>
                   </div>  
                 </div>
 
@@ -116,7 +116,7 @@ export default function Contest(props){
         </div>
         <div className="container row">
                     {audios.length == 0 && 
-                    <h4>Nobody has participated </h4>
+                    <h4>Nobody has participated :( </h4>
                     }
                     {audios.sort((a, b) => new Date(b.created) - new Date(a.date)).map(h => 
                       {return <div className="card m-2" style={{width: "18rem"}}>

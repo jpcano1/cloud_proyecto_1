@@ -1,8 +1,8 @@
 import axios from "axios";
 import Cookie from "js-cookie";
-import configData from '../config.json';
 
-const url = configData.BACKEND_URL+"api"
+
+const url = process.env.REACT_APP_API_URL+ process.env.REACT_APP_PORT+"/api"
 
 export async function post_login(data){
     try{

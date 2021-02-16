@@ -72,10 +72,6 @@ export default function Landing(){
                                 <Button className="m-1" variant="outline-info" href={'/contest/' + h.url}>Details</Button>
                             </div>
                         </div>})}
-
-
     </div>
-    
-
   </div>)
 }

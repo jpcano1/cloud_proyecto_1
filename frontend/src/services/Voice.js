@@ -1,9 +1,9 @@
 import axios from "axios";
-import configData from '../config.json';
 
 
-const url = configData.BACKEND_URL+ "api/voice"
-const urlUpload = configData.BACKEND_URL + "api/voice_upload"
+
+const url = process.env.REACT_APP_API_URL+ process.env.REACT_APP_PORT+ "/api/voice"
+const urlUpload = process.env.REACT_APP_API_URL+ process.env.REACT_APP_PORT + "/api/voice_upload"
 
 
 export async function get_voice_detail(id){
