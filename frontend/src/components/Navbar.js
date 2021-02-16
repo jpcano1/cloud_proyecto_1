@@ -1,6 +1,6 @@
 import React,{useEffect, useState} from 'react';
 import {Link} from "react-router-dom";
-import { Navbar,Button,FormControl,Form,Nav } from 'react-bootstrap';
+import { Navbar,Button,Nav } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/NavbarCss.css'
 import Cookie from "js-cookie";
@@ -15,7 +15,7 @@ export default function NavbarO(){
         if(token){
             setLogged(true)
         }
-    })
+    },[isLogged])
 
     function logOut(){
         Cookie.remove('access_token');
@@ -37,15 +37,13 @@ export default function NavbarO(){
         <Nav className="mr-auto">
         </Nav>
         <div className="button-space">
-        {isLogged
-        ? <Button variant="outline-info" href="/">Home</Button>
+        {isLogged? <Button variant="outline-info" href="/">Home</Button>
         : <Button variant="outline-info" href="/login">Login</Button>
         }
         
         </div>
         <div  className="button-space">
-        {isLogged
-        ? <Button variant="outline-info" href="/" onClick={() => logOut()}>Log Out</Button>
+        {isLogged? <Button variant="outline-info" href="/" onClick={() => logOut()}>Log Out</Button>
         : <Button variant="outline-info" href="/signup">Sign Up</Button>
         }
         </div>

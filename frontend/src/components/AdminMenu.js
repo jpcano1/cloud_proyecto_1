@@ -1,15 +1,16 @@
 import React, {useEffect, useState}from 'react'; 
 import {Button, Modal} from 'react-bootstrap';
-import {get_contests, post_contest, delete_contest,put_contest, upload_banner, get_contest_banner} from '../services/Contest';
+import {get_contests, post_contest, delete_contest,put_contest, upload_banner} from '../services/Contest';
 import DatePicker from "react-datepicker";
+import configData from '../config.json';
 
 
-export default function AdminMenu(){
+export default function AdminMenu(props){
     const [contests, setContest] = useState([]);
     const[contestSelected, setContestSelected] = useState([]); 
-    const urlBanner = "http://localhost:5000/";
+    const urlBanner = configData.BACKEND_URL;
     const[name, setName] = useState("");
-    const[banner, setBanner] = useState([]); 
+    const[banner, setBanner] = useState(""); 
     const[url, setUrl] = useState(""); 
     const[begin_date, setBegin_date] = useState(new Date());
     const[end_date, setEnd_date] = useState(new Date()); 
@@ -18,14 +19,14 @@ export default function AdminMenu(){
     const[recommendations, setRecommendations] = useState("");
     const[showCreateModal, setShowCreateModal] = useState(false);
     const[showEditModal, setShowEditModal] = useState(false);
-    const[images,setImage] = useState([]); 
+    const[showDeleteModal, setShowDeleteModal] = useState(false);
     
     useEffect( ()  => {
-        fetchContest()
+        fetchContest(props.location.state.admin)
     },[contests.length])
 
-     async function fetchContest(){
-        let answer = await get_contests();
+     async function fetchContest(id){
+        let answer = await get_contests(id);
         setContest(answer);
     }
 
@@ -46,8 +47,9 @@ export default function AdminMenu(){
         setShowCreateModal(false);
         fetchContest();
     }
+    
     async function deleteContest(url){
-      let respuesta = await delete_contest(url)
+      await delete_contest(url)
       fetchContest();
     }
     async function editContest(){
@@ -57,11 +59,10 @@ export default function AdminMenu(){
       }
        
         newContest.url = contestSelected.url;
-
         newContest.begin_date = begin_date.getDate() + "/"+ begin_date.getMonth() + "/"+ begin_date.getFullYear();
         newContest.end_date = end_date.getDate() + "/"+ end_date.getMonth() + "/"+ end_date.getFullYear();
       if(banner){
-        await fileUpload(contestSelected.id)
+        await fileUpload(contestSelected.id);
       }
       if(prize){
         newContest.prize = prize; 
@@ -78,8 +79,6 @@ export default function AdminMenu(){
         fetchContest();
     }
     async function fileUpload(id){
-      console.log(id);
-      console.log(banner);
       const fd = new FormData();
       fd.append('banner', banner); 
       await upload_banner(id, fd)
@@ -112,13 +111,16 @@ export default function AdminMenu(){
                     }
                     {contests.map(h => 
                       {return <div className="card m-2" style={{width: "18rem"}}>
-                        <img className="card-img-top" src={urlBanner+h.banner} alt={h.name}/>
+                        <img className="card-img-top img-fluid" src={urlBanner+h.banner} alt={h.name}/>
                             <div className="card-body">
                                 <h5 className="card-title">{h.name}</h5>
-                                <Button className="m-1" variant="outline-danger" onClick={() => deleteContest(h.url)}>Delete</Button>
+                                <Button className="m-1" variant="outline-danger" onClick={() => {
+                                  setContestSelected(h);
+                                  setShowDeleteModal(true);
+                                }}>Delete</Button>
                                 <Button className="m-1" variant="outline-info" onClick={() => {
                                   setContestSelected(h);
-                                  setShowEditModal(true)
+                                  setShowEditModal(true);
                                 }}>Edit</Button>
                                 <Button className="m-1" variant="outline-info" href={'/contest/' + h.url}>Details</Button>
                             </div>
@@ -253,9 +255,9 @@ export default function AdminMenu(){
                     <div className="form-group">
                       <label htmlfor="inputType">Banner</label>
                       <input
-                        type="text"
-                        className="form-control"
-                        onChange={(e) => setBanner(e.target.value)}
+                        type="file"
+                        className="form-control-file"
+                        onChange={(e) => setBanner(e.target.files[0])}
                       />
                     </div>
                     <div className="form-group">
@@ -320,6 +322,42 @@ export default function AdminMenu(){
                   >
                     Edit Constest
               </button>
+                </div>
+              </div>
+            </Modal>
+            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+              <div className="modal-content">
+                <div className="modal-header">
+                    <h5 className="modal-title" id="addProductModalLabel">
+                      Are you sure?
+                    </h5>
+                    <button
+                        type="button"
+                        className="close"
+                        data-dismiss="modal"
+                        aria-label="Close"
+                        onClick={() => setShowDeleteModal(false)}
+                    >
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div className="modal-footer">
+                <button
+                    type="button"
+                    className="btn btn-info m-2"
+                    data-dismiss="modal"
+                    onClick={() => setShowDeleteModal(false)}
+                  >
+                    No
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-danger m-2"
+                    data-dismiss="modal"
+                    onClick={() => deleteContest(contestSelected.url)}
+                  >
+                    Yes
+                  </button>
                 </div>
               </div>
             </Modal>

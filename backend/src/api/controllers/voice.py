@@ -2,7 +2,7 @@ allowed_extensions = {
     "audio/ogg", "audio/wav",
     "audio/oga", "audio/m4a",
     "audio/aac", "audio/wma",
-    "audio/wave", "audio/mp3"
+    "audio/wave", "audio/mpeg"
 }
 
 class VoiceController:

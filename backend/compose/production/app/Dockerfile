@@ -28,6 +28,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt full-upgrade -y && \
         apt-get install -y --no-install-recommends \
         tzdata \
+        vim \
         git \
         ffmpeg \
         && \

@@ -42,13 +42,10 @@ class Voice(Resource):
         page = request.args.get("page", 1, type=int)
         if request.args.get("contest_id"):
             fetched = VoiceModel.query.filter_by(
-                contest=request.args.get("contest_id"),
-                converted=True
+                contest=request.args.get("contest_id")
             )
         else:
-            fetched = VoiceModel.query.filter_by(
-                converted=True
-            )
+            fetched = VoiceModel.query
 
         fetched = fetched.order_by(
             VoiceModel.created.desc()
@@ -96,16 +93,7 @@ class VoiceDetail(Resource):
         :param voice_id: The id of the voice
         :return: A 200 status code message
         """
-        fetched = VoiceModel.query.filter_by(
-            id=voice_id,
-            converted=True
-        ).first()
-        # If it wasn't found, it returns a 404 status
-        # code message.
-        if not fetched:
-            return response_with(responses.SERVER_ERROR_404, value={
-                "error_message": "Resource does not exist or it hasn't been converted"
-            })
+        fetched = VoiceModel.query.get_or_404(voice_id)
         voice_schema = VoiceSchema()
         voice = voice_schema.dump(fetched)
         return response_with(responses.SUCCESS_200, value={
@@ -120,10 +108,7 @@ class VoiceDetail(Resource):
         """
         # Fetches the voice, if it's not found,
         # it returns a 404 status code message
-        fetched = VoiceModel.query.filter_by(
-            id=voice_id,
-            converted=True
-        ).first()
+        fetched = VoiceModel.query.get_or_404(voice_id)
 
         if not fetched:
             return response_with(responses.SERVER_ERROR_404, value={
@@ -146,12 +131,12 @@ class VoiceUpload(Resource):
         # This is the file from the form-data
         file: werk.FileStorage = request.files.get("audio", None)
         # If it was submitted, save it
-        if fetched:
+        if fetched and fetched.raw_audio == "":
             # Controller stage of the voice file
-            if not self.voice_controller(file.content_type):
+            if file and not self.voice_controller(file.content_type):
                 return response_with(responses.INVALID_INPUT_422,
                                      error="File type not allowed")
-            if file and self.voice_controller(file.content_type):
+            elif file and self.voice_controller(file.content_type):
                 filename = secure_filename("_".join([
                     str(fetched.id), fetched.name,
                     fetched.last_name, file.filename
@@ -169,7 +154,7 @@ class VoiceUpload(Resource):
             # To the saved audio, defines the url to find it
             # the url is defined w.r.t the function defined
             # in the app.py
-            fetched.audio = url_for("upload_raw_audio",
+            fetched.raw_audio = url_for("upload_raw_audio",
                                     filename=filename,
                                     _external=False)
             db.session.add(fetched)
@@ -178,4 +163,5 @@ class VoiceUpload(Resource):
                 "message": "Audio Uploaded!"
             })
 
-        return response_with(responses.SERVER_ERROR_404)
+        return response_with(responses.FORBIDDEN_403,
+                             error="Voice already has audio file or it doesn't exist")
