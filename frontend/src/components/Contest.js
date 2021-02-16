@@ -45,7 +45,8 @@ export default function Contest(props){
     async function fetchAudios(page=1){
       let answer = await get_voices(contest.id,page); 
       if(!isLogged){
-        setAudios(answer.voices.filter((d) => d.converted=="true"));
+        console.log(answer);
+        setAudios(answer.voices.filter((d) => d.converted));
       }
       else{
         setAudios(answer.voices);
@@ -116,7 +117,7 @@ export default function Contest(props){
                             <div className="card-body">
                                 <h5 className="card-title">{h.name +" "+ h.last_name}</h5>
                                 <h6>{h.email}</h6>
-                                <h6>Raw Audio</h6>
+                                {isLogged && <h6>Raw Audio</h6>}
                                 {isLogged && <div className="container-fluid">
                                               <audio className="audio-style" src={urlAudio+h.raw_audio} controls>
                                                 Your browser does not support the <code>audio</code> element.
@@ -128,7 +129,7 @@ export default function Contest(props){
                                     Your browser does not support the <code>audio</code> element.
                                   </audio>
                                 </div>
-                                {isLogged && <h6>Converted: {h.converted=="true"? "Converted":"In Process"}</h6>}
+                                {isLogged && <h6>Converted: {h.converted? "Converted":"In Process"}</h6>}
 
                             </div>
                             <div className="card-footer">
