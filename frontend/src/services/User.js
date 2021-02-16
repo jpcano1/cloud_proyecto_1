@@ -2,7 +2,7 @@ import axios from "axios";
 import Cookie from "js-cookie";
 import configData from '../config.json';
 
-const url = configData.BACKEND_URL+"api";
+const url = configData.BACKEND_URL+"api"
 
 export async function post_login(data){
     try{
@@ -12,15 +12,14 @@ export async function post_login(data){
         return answer.data.admin_id
     }
     catch (error) {
-        // Error 
+        // Error 😨
         if (error.response) {
             /*
              * The request was made and the server responded with a
              * status code that falls out of the range of 2xx
              */
             console.log(error.response.data);
-            console.log(error.response.status);
-            console.log(error.response.headers);
+            return error.response.data.errors;
         } else if (error.request) {
             /*
              * The request was made but no response was received, `error.request`

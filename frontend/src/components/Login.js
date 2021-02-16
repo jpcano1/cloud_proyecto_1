@@ -12,6 +12,16 @@ export default function Login(){
     const [email, setEmail] = useState([]);
     const [password, setPassword] = useState([]);
 
+    const[openBar, setOpenBar] = useState(false);
+    const[message,setMessage] = useState(""); 
+  
+    function handleClose (event, reason){
+      if (reason === 'clickaway') {
+        return;
+      }
+  
+      setOpenBar(false);
+    }
     function validateForm() {
       return email.length > 0 && password.length > 0;
     }
@@ -20,7 +30,14 @@ export default function Login(){
       event.preventDefault();
       let data = {"email": email, "password":password}; 
       let answer = await post_login(data);
-      history.push({pathname:"/contest", state: { admin: answer }});
+      if(typeof(answer)==='number'){
+          history.push({pathname:"/contest", state: { admin: answer }});
+      }
+      else{
+        setMessage(answer); 
+        setOpenBar(true);
+      }
+      
     }
     return(
         <div className="Login justify-content-center center  col-4">
@@ -47,6 +64,11 @@ export default function Login(){
           Login
         </Button>
       </Form>
+      <Snackbar open={openBar} autoHideDuration={6000} onClose={handleClose}>
+      <MuiAlert onClose={handleClose} severity="error">
+        {message}
+      </MuiAlert>
+      </Snackbar>
     </div>
     )
 }
