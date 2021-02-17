@@ -8,7 +8,6 @@ export async function post_login(data){
     try{
         let answer = await axios.post(url+"/login",data);
         Cookie.set("access_token",answer.data.access_token);
-        console.log(answer);
         return answer.data.admin_id
     }
     catch (error) {

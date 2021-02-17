@@ -7,13 +7,12 @@ import Carousel2 from '../images/Carousel 2.jpg';
 import Logo from '../images/Logo SuperVoices.png';
 import {get_contests} from '../services/Contest';
 import '../css/Lading.css';
-import configData from '../config.json';
 
 export default function Landing(){
 
 
     //URL for request banners
-    const urlBanner = configData.BACKEND_URL;
+    const urlBanner = process.env.REACT_APP_API_URL+ process.env.REACT_APP_PORT;
     // var pad = {
     //     paddingHorizontal: 100
     // }

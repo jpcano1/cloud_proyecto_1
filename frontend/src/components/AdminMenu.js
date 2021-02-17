@@ -31,9 +31,11 @@ export default function AdminMenu(){
     const[errorModal, setErrorModal] = useState(false);
     //Manage redirects
     const history = useHistory();
+    //
+    const[dateChange,setDateChange] = useState(false);
     
-    useEffect( ()  => {
-        fetchContest()
+    useEffect(async ()  => {
+        await fetchContest()
     },[contests.length])
 
      async function fetchContest(){
@@ -98,8 +100,12 @@ export default function AdminMenu(){
       }
        
         newContest.url = contestSelected.url;
+
+      if(dateChange){
         newContest.begin_date = begin_date.getDate() + "/"+ begin_date.getMonth() + "/"+ begin_date.getFullYear();
         newContest.end_date = end_date.getDate() + "/"+ end_date.getMonth() + "/"+ end_date.getFullYear();
+      }
+
       if(banner){
         await fileUpload(contestSelected.id);
       }
@@ -342,7 +348,8 @@ export default function AdminMenu(){
                       id="inputBeginDate"
                       type="date"
                       className="form-control"
-                      onChange={date => setBegin_date(new Date(date.target.value))}
+                      onChange={date => {setBegin_date(new Date(date.target.value))
+                                        setDateChange(true)}}
                       />
                     </div>
                     <div className="form-group">
@@ -351,7 +358,8 @@ export default function AdminMenu(){
                       id="inputEndDate"
                       type="date"
                       className="form-control"
-                      onChange={date => setEnd_date(new Date(date.target.value))}
+                      onChange={date => {setEnd_date(new Date(date.target.value))
+                                        setDateChange(true)}}
                       />
                     </div>
                     <div className="form-group">

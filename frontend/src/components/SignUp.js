@@ -3,7 +3,9 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import {post_register} from '../services/User';
 import { useHistory } from "react-router-dom";
-import '../css/LoginCss.css'
+import '../css/LoginCss.css';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
 
 export default function SignUp(){
     const history = useHistory();
@@ -13,8 +15,18 @@ export default function SignUp(){
     const [password, setPassword] = useState("");
     const[confirmPassword, setConfirmPassword] = useState("");
 
+    const[openBar, setOpenBar] = useState(false);
+    const[message,setMessage] = useState(""); 
+
     function validateForm() {
       return email.length > 0 && password.length > 0 && password == confirmPassword;
+    }
+    function handleClose (event, reason){
+      if (reason === 'clickaway') {
+        return;
+      }
+  
+      setOpenBar(false);
     }
   
     async function handleSubmit(event) {
@@ -24,8 +36,21 @@ export default function SignUp(){
       newAdmin.last_name = last_name; 
       newAdmin.email = email; 
       newAdmin.password = password;
-      await post_register(newAdmin);
-      history.push("/login");
+      try{
+        await post_register(newAdmin);
+        history.push("/login");
+      }
+      catch(error){
+        if(error.response){
+          setMessage(error.response.data.errors);
+          setOpenBar(true);
+        }
+        else
+        {
+          setMessage(error.message);
+        }
+      }
+
     }
     return(
         <div className="Login justify-content-center center col-4">
@@ -77,6 +102,12 @@ export default function SignUp(){
           Register
         </Button>
       </Form>
+
+      <Snackbar open={openBar} autoHideDuration={6000} onClose={handleClose}>
+      <MuiAlert onClose={handleClose} severity="error">
+        {message}
+      </MuiAlert>
+      </Snackbar>
     </div>
     )
 }
