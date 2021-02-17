@@ -5,6 +5,11 @@ import os
 from flask import render_template
 
 def retrieve():
+    """
+
+    :return:
+    :rtype:
+    """
     fetched = VoiceModel.query.filter_by(
         converted=False
     ).all()
@@ -24,6 +29,13 @@ def notify_converted(name, email):
     print("Email Sent!")
 
 def convert(audio_url):
+    """
+
+    :param audio_url:
+    :type audio_url:
+    :return:
+    :rtype:
+    """
     full_path = audio_url[1:]
     audio_name = full_path.split("/")[-1]
     if audio_name.endswith(".mp3"):
@@ -38,6 +50,11 @@ def convert(audio_url):
 
 @current_app.task(name="audio_converter")
 def converter():
+    """
+
+    :return:
+    :rtype:
+    """
     fetched_voices = retrieve()
 
     counter = 0

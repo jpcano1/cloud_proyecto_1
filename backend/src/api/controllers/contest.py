@@ -13,4 +13,11 @@ class ContestController:
         return format_ in allowed_extensions
 
     def __call__(self, *args, **kwargs):
+        """
+        This function is called when the ContestController
+        object is called
+        :param args: The function arguments
+        :param kwargs: The function keyword arguments
+        :return: The result of the validation
+        """
         return self.validate_format(*args)

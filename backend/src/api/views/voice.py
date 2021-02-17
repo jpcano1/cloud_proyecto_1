@@ -23,6 +23,15 @@ from ..controllers import VoiceController
 class Voice(Resource):
     @staticmethod
     def paginated_voices(results, pagination: fs.Pagination):
+        """
+
+        :param results:
+        :type results:
+        :param pagination:
+        :type pagination:
+        :return:
+        :rtype:
+        """
         prev_page = pagination.prev_num
         next_page = pagination.next_num
         value = {

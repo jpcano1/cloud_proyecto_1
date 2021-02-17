@@ -17,7 +17,8 @@ def init_app(app: Flask):
                         broker=app.config["CELERY_BROKER"],
                         backend=app.config["CELERY_BACKEND"])
 
-    # The beat scheduler
+    # The beat scheduler executes the converter
+    # each 15 seconds
     celery_app.conf.beat_schedule = {
         "app-schedule": {
             "task": "audio_converter",
@@ -43,5 +44,6 @@ def init_app(app: Flask):
             with app.app_context():
                 return TaskBase.__call__(self, *args, **kwargs)
 
+    # We assign the new object
     celery_app.Task = ContextTask
     return celery_app
