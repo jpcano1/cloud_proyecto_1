@@ -150,8 +150,10 @@ class ContestDetail(Resource):
         """
         Deletes a contest from the database
         :param url: The url of the contest to be deleted
-        :return: A 204 status code message
+        :return: A 204 status code message if deleted, otherwise
+        a 404 status code response if not found
         """
+        # The identity of the deleter admin
         admin_id = get_jwt_identity()
         fetched = ContestModel.query.filter_by(
             url=url, admin=admin_id
@@ -169,18 +171,23 @@ class BannerUpload(Resource):
     @jwt_required()
     def post(self, contest_id):
         """
-
-        :param contest_id:
-        :type contest_id:
-        :return:
-        :rtype:
+        Updates the banner of the contest
+        :param contest_id: The id of the existing contest
+        :return: A 200 status code message if updated, otherwise,
+        a 404 error if not found.
         """
+
+        # The id of the updater admin
         admin_id = get_jwt_identity()
         fetched = ContestModel.query.filter_by(
             admin=admin_id, id=contest_id
         ).first()
         if fetched:
+            # The storage process from the banner in the form-data
+            # body request
             file: werk.FileStorage = request.files.get("banner", None)
+
+            # Validate the file type with the controller
             if file and not self.contest_controller(file.content_type):
                 return response_with(responses.INVALID_INPUT_422,
                                      error="File type not allowed")
@@ -197,6 +204,7 @@ class BannerUpload(Resource):
             else:
                 return response_with(responses.INVALID_INPUT_422,
                                      error="There is no file")
+            # Create a url to the image
             fetched.banner = url_for("upload_banner",
                                      filename=filename)
             db.session.add(fetched)
