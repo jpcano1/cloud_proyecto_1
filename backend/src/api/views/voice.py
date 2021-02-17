@@ -162,9 +162,11 @@ class VoiceUpload(Resource):
             # To the saved audio, defines the url to find it
             # the url is defined w.r.t the function defined
             # in the app.py
-            fetched.raw_audio = url_for("upload_raw_audio",
-                                    filename=filename,
-                                    _external=False)
+            fetched.raw_audio = os.path.join(
+                "/src",
+                current_app.config["RAW_AUDIOS_FOLDER"],
+                filename
+            )
             db.session.add(fetched)
             db.session.commit()
             return response_with(responses.SUCCESS_200, value={

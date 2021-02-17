@@ -205,8 +205,11 @@ class BannerUpload(Resource):
                 return response_with(responses.INVALID_INPUT_422,
                                      error="There is no file")
             # Create a url to the image
-            fetched.banner = url_for("upload_banner",
-                                     filename=filename)
+            fetched.banner = os.path.join(
+                "src",
+                current_app.config["BANNERS_FOLDER"],
+                filename
+            )
             db.session.add(fetched)
             db.session.commit()
             return response_with(responses.SUCCESS_200, value={

@@ -82,15 +82,6 @@ def upload_converted_audio(filename):
     """
     return send_from_directory(app.config["CONVERTED_AUDIOS_FOLDER"], filename)
 
-@app.route("/uploads/banner/<filename>", methods=["GET"])
-def upload_banner(filename):
-    """
-    Route to upload the banner file
-    :param filename: The filename of the banner
-    :return: The url of the saved banner
-    """
-    return send_from_directory(app.config["BANNERS_FOLDER"], filename)
-
 @app.route("/")
 @jwt_required()
 def hola():
