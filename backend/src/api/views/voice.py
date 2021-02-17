@@ -24,13 +24,12 @@ class Voice(Resource):
     @staticmethod
     def paginated_voices(results, pagination: fs.Pagination):
         """
-
-        :param results:
-        :type results:
-        :param pagination:
-        :type pagination:
-        :return:
-        :rtype:
+        This methods paginates the voices list
+        :param results: The results from the queried voices
+        :param pagination: The pagination object in charge of
+        manage the pagination
+        :type pagination: fs.Pagination
+        :return: The response body
         """
         prev_page = pagination.prev_num
         next_page = pagination.next_num
@@ -74,9 +73,9 @@ class Voice(Resource):
     def post(self):
         """
         Creates a voice in the database
-        :return: A 200 status code message
         :exception ValidationError: If the
         body request has missing fields.
+        :return: A 200 status code message
         """
         data = request.get_json()
         voice_schema = VoiceSchema()

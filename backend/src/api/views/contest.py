@@ -25,10 +25,13 @@ from ..controllers import ContestController
 class Contest(Resource):
     def get(self):
         """
-
-        :return:
-        :rtype:
+        Retrieves the list con contest in the entire
+        database
+        :return: The list of contests
         """
+
+        # If the query param admin exists, it filters
+        # otherwise, it returns everything
         if request.args.get("admin_id"):
             fetched = ContestModel.query.filter_by(
                 admin=request.args.get("admin_id")
@@ -44,11 +47,19 @@ class Contest(Resource):
     @jwt_required()
     def post(self):
         """
-
-        :return:
-        :rtype:
+        Creates a contest in the database
+        :exception ValidationError: If the body request
+        has missing fields
+        :exception IntegrityError: If the url already exists
+        in the database
+        :exception Exception: If there another error during
+        the execution
+        :return: A 200 status code message
         """
+
+        # The body data
         data = request.get_json()
+        # The identity of the creator admin
         data["admin"] = get_jwt_identity()
         contest_schema = ContestSchema()
 
@@ -73,11 +84,10 @@ class Contest(Resource):
 class ContestDetail(Resource):
     def get(self, url):
         """
-
-        :param url:
-        :type url:
-        :return:
-        :rtype:
+        Retrieves a contest from its url
+        :param url: The url to filter the contest
+        :return: A 200 status code message if the contest
+        was found, otherwise, 404 error
         """
         fetched = ContestModel.query.filter_by(
             url=url
@@ -94,12 +104,12 @@ class ContestDetail(Resource):
     @jwt_required()
     def put(self, url):
         """
-
-        :param url:
-        :type url:
-        :return:
-        :rtype:
+        Updates a contest in the database
+        :param url: The url of the contest to be retrieved
+        :return: A 200 status code answer if updated, otherwise
+        a 404 error if not found
         """
+        # Identity of the updater admin
         admin_id = get_jwt_identity()
         contest = ContestModel.query.filter_by(
             url=url, admin=admin_id
@@ -108,6 +118,7 @@ class ContestDetail(Resource):
             return response_with(responses.SERVER_ERROR_404,
                                  error="Resource does not exists")
 
+        # Looks every field in the request body
         data = request.get_json()
         if "name" in data:
             contest.name = data["name"]
@@ -137,11 +148,9 @@ class ContestDetail(Resource):
     @jwt_required()
     def delete(self, url):
         """
-
-        :param url:
-        :type url:
-        :return:
-        :rtype:
+        Deletes a contest from the database
+        :param url: The url of the contest to be deleted
+        :return: A 204 status code message
         """
         admin_id = get_jwt_identity()
         fetched = ContestModel.query.filter_by(
@@ -172,10 +181,10 @@ class BannerUpload(Resource):
         ).first()
         if fetched:
             file: werk.FileStorage = request.files.get("banner", None)
-            if not self.contest_controller(file.content_type):
+            if file and not self.contest_controller(file.content_type):
                 return response_with(responses.INVALID_INPUT_422,
                                      error="File type not allowed")
-            if file and self.contest_controller(file.content_type):
+            elif file and self.contest_controller(file.content_type):
                 filename = secure_filename("_".join([
                     fetched.url,
                     file.filename
