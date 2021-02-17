@@ -82,11 +82,6 @@ def upload_converted_audio(filename):
     """
     return send_from_directory(app.config["CONVERTED_AUDIOS_FOLDER"], filename)
 
-@app.route("/")
-@jwt_required()
-def hola():
-    return "Hola"
-
 # Admin Routes
 api.add_resource(SignUp, "/api/signup")
 api.add_resource(Login, "/api/login")
