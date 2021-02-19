@@ -206,7 +206,7 @@ class BannerUpload(Resource):
                                      error="There is no file")
             # Create a url to the image
             fetched.banner = os.path.join(
-                "src",
+                "/src",
                 current_app.config["BANNERS_FOLDER"],
                 filename
             )
