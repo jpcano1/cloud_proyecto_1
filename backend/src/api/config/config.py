@@ -9,6 +9,7 @@ class Config(object):
     BANNERS_FOLDER = "static/banners"
     CONVERTED_AUDIOS_FOLDER = "static/converted_audios"
     RAW_AUDIOS_FOLDER = "static/raw_audios"
+    LOGS_FOLDER = "static/logs"
     PROPAGATE_EXCEPTIONS = True
     CELERY_BROKER = os.getenv("REDIS_URL", "redis://localhost:6379/0")
     CELERY_BACKEND = os.getenv("REDIS_URL", "redis://localhost:6379/0")
@@ -34,6 +35,7 @@ class ProductionConfig(Config):
 
 class DevelopmentConfig(Config):
     DEBUG = True
+    TESTING = True
     SQLALCHEMY_ECHO = False
     SQLITE_DB = os.getenv("SQLITE_DB", "example.db")
 

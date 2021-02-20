@@ -3,12 +3,23 @@ from ..models import Voice as VoiceModel
 from ..utils import db, send_email
 import os
 from flask import render_template
+import time
+import logging
+import os
+
+if not os.path.exists("src/static/logs"):
+    os.makedirs("src/static/logs")
+
+logger = logging.getLogger("voices_logger")
+logger.setLevel(logging.INFO)
+
+file_handler = logging.FileHandler("src/static/logs/voice.logs")
+logger.addHandler(file_handler)
 
 def retrieve():
     """
-
-    :return:
-    :rtype:
+    Retrieves all the non-converted voices
+    :return: A collection of voices
     """
     fetched = VoiceModel.query.filter_by(
         converted=False
@@ -30,37 +41,41 @@ def notify_converted(name, email):
 
 def convert(audio_url):
     """
-
-    :param audio_url:
-    :type audio_url:
+    This method converts a song from any format to mp3
+    :param audio_url: The url of the audio to be converted
     :return:
     :rtype:
     """
+    # Get the full audio url
     full_path = audio_url[1:]
+    # Get the full audio name
     audio_name = full_path.split("/")[-1]
     if audio_name.endswith(".mp3"):
         converted_path = "src/static/converted_audios/" + audio_name
     else:
         converted_path = "src/static/converted_audios/" + audio_name + ".mp3"
 
+    # Method of conversion
     if not os.path.exists(converted_path):
-        print(f"Converting {full_path} to {converted_path}")
         os.system(f"ffmpeg -i {full_path} {converted_path}")
     return "/" + converted_path
 
 @current_app.task(name="audio_converter")
 def converter():
     """
-
-    :return:
-    :rtype:
+    The converter method, checks the database
+    looking for non-converted voices
     """
     fetched_voices = retrieve()
 
     counter = 0
     for voice in fetched_voices:
         if voice.raw_audio:
+            start_time = time.time()
             path = convert(voice.raw_audio)
+            total_time = time.time() - start_time
+            msg = f"Voice {voice.id} - {voice.name} converted in: {total_time} seconds"
+            logger.info(msg)
             voice.converted = True
             voice.converted_audio = path
             db.session.add(voice)

@@ -3,7 +3,7 @@ from flask import Flask, send_from_directory
 from flask_bcrypt import Bcrypt
 from flask_restful import Api
 from flask_cors import CORS
-from flask_jwt_extended import JWTManager, jwt_required
+from flask_jwt_extended import JWTManager
 
 # App Configurations
 from src.api.config import (DevelopmentConfig,
@@ -43,6 +43,15 @@ else:
 
 app.config.from_object(app_config)
 
+if not os.path.exists("src/" + app.config["BANNERS_FOLDER"]):
+    os.makedirs("src/" + app.config["BANNERS_FOLDER"])
+
+if not os.path.exists(os.path.join("src", app.config["CONVERTED_AUDIOS_FOLDER"])):
+    os.makedirs(os.path.join("src", app.config["CONVERTED_AUDIOS_FOLDER"]))
+
+if not os.path.exists(os.path.join("src", app.config["RAW_AUDIOS_FOLDER"])):
+    os.makedirs(os.path.join("src", app.config["RAW_AUDIOS_FOLDER"]))
+
 api = Api(app)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
@@ -53,15 +62,6 @@ mail.init_app(app)
 db.init_app(app)
 with app.app_context():
     db.create_all()
-
-if not os.path.exists("src/" + app.config["BANNERS_FOLDER"]):
-    os.makedirs("src/" + app.config["BANNERS_FOLDER"])
-
-if not os.path.exists("src/" + app.config["CONVERTED_AUDIOS_FOLDER"]):
-    os.makedirs("src/" + app.config["CONVERTED_AUDIOS_FOLDER"])
-
-if not os.path.exists("src/" + app.config["RAW_AUDIOS_FOLDER"]):
-    os.makedirs("src/" + app.config["RAW_AUDIOS_FOLDER"])
 
 @app.route("/src/static/raw_audios/<filename>", methods=["GET"])
 def upload_raw_audio(filename):
