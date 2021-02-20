@@ -1,6 +1,6 @@
 # Flask Imports
 from flask_restful import Resource
-from flask import request, current_app, url_for
+from flask import request, current_app
 import flask_sqlalchemy as fs
 
 # Models and Utils Imports
