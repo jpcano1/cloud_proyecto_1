@@ -10,6 +10,7 @@ from ..utils import response_with, responses, db
 
 # Marshmallow imports
 from marshmallow.exceptions import ValidationError
+from sqlalchemy.exc import IntegrityError
 
 # Werkzeug utils
 from werkzeug.utils import secure_filename
@@ -81,13 +82,15 @@ class Voice(Resource):
         voice_schema = VoiceSchema()
 
         try:
-            voice = voice_schema.load(data, session=db.session)
+            voice: VoiceModel = voice_schema.load(data, session=db.session)
             result = voice_schema.dump(voice.create())
         except ValidationError as e:
             a = e.messages.keys()
-            return response_with(responses.MISSING_PARAMETERS_422, value={
-                "error_message": "Missing Fields: " + ", ".join(a)
-            })
+            return response_with(responses.MISSING_PARAMETERS_422,
+                                 error="Missing Fields: " + ", ".join(a))
+        except IntegrityError:
+            return response_with(responses.INVALID_INPUT_422,
+                                 error="The contest doesn't exist")
         return response_with(responses.SUCCESS_200, value={
             "message": "Voice uploaded!",
             "voice": result

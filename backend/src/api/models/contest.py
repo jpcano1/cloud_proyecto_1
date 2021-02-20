@@ -21,7 +21,8 @@ class Contest(db.Model):
     script = db.Column(db.String(255), nullable=False)
     recommendations = db.Column(db.String(255), default="")
     admin = db.Column(db.Integer, db.ForeignKey("admins.id"))
-    voices = db.relationship("Voice", backref="Contest", cascade="all, delete-orphan")
+    voices = db.relationship("Voice", backref="Contest",
+                             cascade="all, delete-orphan")
 
     def create(self):
         """

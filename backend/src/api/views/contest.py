@@ -1,6 +1,6 @@
 # Flask Libraries
 from flask_restful import Resource
-from flask import request, current_app, url_for
+from flask import request, current_app
 from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -51,7 +51,7 @@ class Contest(Resource):
         :exception ValidationError: If the body request
         has missing fields
         :exception IntegrityError: If the url already exists
-        in the database
+        in the database or if the user doesn't
         :exception Exception: If there another error during
         the execution
         :return: A 200 status code message
@@ -72,7 +72,7 @@ class Contest(Resource):
                                  error="Missing Fields: " + ", ".join(a))
         except IntegrityError:
             return response_with(responses.INVALID_FIELD_NAME_SENT_422,
-                                 error="Url already exists")
+                                 error="Invalid url or user")
         except Exception as e:
             return response_with(responses.INVALID_INPUT_422,
                                  error=str(e))
