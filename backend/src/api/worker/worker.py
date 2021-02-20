@@ -18,11 +18,11 @@ def init_app(app: Flask):
                         backend=app.config["CELERY_BACKEND"])
 
     # The beat scheduler executes the converter
-    # each 15 seconds
+    # each interval defined in the app config
     celery_app.conf.beat_schedule = {
         "app-schedule": {
             "task": "audio_converter",
-            "schedule": timedelta(seconds=15)
+            "schedule": timedelta(seconds=app.config["CELERY_SCHEDULE_TIME"])
         }
     }
 

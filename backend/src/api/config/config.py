@@ -13,6 +13,7 @@ class Config(object):
     PROPAGATE_EXCEPTIONS = True
     CELERY_BROKER = os.getenv("REDIS_URL", "redis://localhost:6379/0")
     CELERY_BACKEND = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+    CELERY_SCHEDULE_TIME = os.getenv("CELERY_SCHEDULE_TIME", 15)
 
 class ProductionConfig(Config):
     POSTGRES_USERNAME = os.getenv("POSTGRES_USER")

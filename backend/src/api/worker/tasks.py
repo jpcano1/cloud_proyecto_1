@@ -43,8 +43,7 @@ def convert(audio_url):
     """
     This method converts a song from any format to mp3
     :param audio_url: The url of the audio to be converted
-    :return:
-    :rtype:
+    :return: The path of the converted voice
     """
     # Get the full audio url
     full_path = audio_url[1:]
@@ -71,13 +70,17 @@ def converter():
     counter = 0
     for voice in fetched_voices:
         if voice.raw_audio:
+            # Start time
             start_time = time.time()
             path = convert(voice.raw_audio)
+            # Final time
             total_time = time.time() - start_time
-            msg = f"Voice {voice.id} - {voice.name} converted in: {total_time} seconds"
+            msg = f"{voice.id},{total_time}"
+            # Log message
             logger.info(msg)
             voice.converted = True
             voice.converted_audio = path
+            # Update route
             db.session.add(voice)
             db.session.commit()
             print(f"Voice: {voice.id} converted")
