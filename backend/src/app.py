@@ -63,6 +63,33 @@ if not os.path.exists("src/" + app.config["CONVERTED_AUDIOS_FOLDER"]):
 if not os.path.exists("src/" + app.config["RAW_AUDIOS_FOLDER"]):
     os.makedirs("src/" + app.config["RAW_AUDIOS_FOLDER"])
 
+@app.route("/src/static/raw_audios/<filename>", methods=["GET"])
+def upload_raw_audio(filename):
+    """
+    Route to upload the raw audio file
+    :param filename: The filename of the audio
+    :return: The url of the saved audio
+    """
+    return send_from_directory(app.config["RAW_AUDIOS_FOLDER"], filename)
+
+@app.route("/src/static/converted_audios/<filename>", methods=["GET"])
+def upload_converted_audio(filename):
+    """
+    Route to upload the converted audio file
+    :param filename: The filename of the audio
+    :return: The url of the saved audio
+    """
+    return send_from_directory(app.config["CONVERTED_AUDIOS_FOLDER"], filename)
+
+@app.route("/src/static/banners/<filename>", methods=["GET"])
+def upload_banner(filename):
+    """
+    Route to upload the banner file
+    :param filename: The filename of the banner
+    :return: The url of the saved banner
+    """
+    return send_from_directory(app.config["BANNERS_FOLDER"], filename)
+
 # Admin Routes
 api.add_resource(SignUp, "/api/signup")
 api.add_resource(Login, "/api/login")
