@@ -116,12 +116,21 @@ class VoiceDetail(Resource):
         """
         # Fetches the voice, if it's not found,
         # it returns a 404 status code message
-        fetched = VoiceModel.query.get_or_404(voice_id)
+        fetched: VoiceModel = VoiceModel.query.get_or_404(voice_id)
 
         if not fetched:
             return response_with(responses.SERVER_ERROR_404, value={
                 "error_message": "Resource does not exist"
             })
+
+        # Deletes the raw audio
+        if fetched.raw_audio != "":
+            os.remove(fetched.raw_audio[1:])
+
+        # Deletes converted audio
+        if fetched.converted and fetched.converted_audio != "":
+            os.remove(fetched.converted_audio[1:])
+
         db.session.delete(fetched)
         db.session.commit()
         return response_with(responses.SUCCESS_204)
