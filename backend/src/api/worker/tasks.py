@@ -56,7 +56,7 @@ def convert(audio_url):
 
     # Method of conversion
     if not os.path.exists(converted_path):
-        os.system(f"ffmpeg -i {full_path} {converted_path}")
+        os.system(f"ffmpeg -hide_banner -loglevel error -i {full_path} {converted_path}")
     return "/" + converted_path
 
 @current_app.task(name="audio_converter")
