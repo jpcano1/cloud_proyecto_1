@@ -71,13 +71,10 @@ def converter():
     for voice in fetched_voices:
         if voice.raw_audio:
             # Start time
-            start_time = time.time()
+            logger.info(f"{voice.id},begin,{time.time()}")
             path = convert(voice.raw_audio)
-            # Final time
-            total_time = time.time() - start_time
-            msg = f"{voice.id},{total_time}"
             # Log message
-            logger.info(msg)
+            logger.info(f"{voice.id},end,{time.time()}")
             voice.converted = True
             voice.converted_audio = path
             # Update route
