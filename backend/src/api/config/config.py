@@ -36,7 +36,6 @@ class ProductionConfig(Config):
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    TESTING = True
     SQLALCHEMY_ECHO = False
     SQLITE_DB = os.getenv("SQLITE_DB", "example.db")
 
@@ -60,6 +59,7 @@ class DevelopmentConfig(Config):
     MAIL_USERNAME = os.getenv("EMAIL_USERNAME")
     MAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
     MAIL_USE_TLS = os.getenv("EMAIL_USE_TLS")
+    MAIL_SUPPRESS_SEND = True
     MAIL_DEBUG = False
 
 class TestingConfig(Config):
