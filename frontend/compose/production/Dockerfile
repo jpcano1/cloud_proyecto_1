@@ -1,4 +1,4 @@
-FROM node:14
+FROM node:12.21.0 AS build
 
 ENV APP_DIR /app
 WORKDIR $APP_DIR
@@ -7,18 +7,24 @@ ADD package.json $APP_DIR
 ADD src $APP_DIR/src
 ADD public $APP_DIR/public
 
-ADD compose/start $APP_DIR
-RUN sed -i 's/\r//' $APP_DIR/start
-RUN chmod +x $APP_DIR/start
-
 RUN apt-get update && apt full-upgrade -y && \
         apt-get install -y --no-install-recommends \
-        tzdata \
         git \
-        ffmpeg \
         vim \
         && \
         apt-get clean && \
         rm -rf /var/lib/apt/lists/*
 
-RUN npm install
+RUN npm install --silent
+
+RUN npm run build
+
+FROM nginx:1.16.0-alpine
+COPY --from=build /app/build /usr/share/nginx/html
+
+RUN rm /etc/nginx/conf.d/default.conf
+COPY nginx/nginx.conf /etc/nginx/conf.d
+
+EXPOSE 80
+
+CMD ["nginx","-g","daemon off;"]
