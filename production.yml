@@ -7,6 +7,7 @@ networks:
 volumes:
   local_postgres_data: {}
   local_postgres_data_backups: {}
+  voice_data: {}
 
 services:
   db:
@@ -29,6 +30,8 @@ services:
     env_file:
       - backend/env/production/app
       - backend/env/production/postgres
+    volumes:
+      - voice_data:/app/src
     ports:
       - 5000:5000
     command: /app/start
