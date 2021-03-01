@@ -51,7 +51,7 @@ services:
     env_file:
       - frontend/env/app
     ports:
-      - 80:80
+      - 3000:80
     depends_on:
       - backend
       - db
