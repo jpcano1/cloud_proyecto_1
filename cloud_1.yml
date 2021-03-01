@@ -34,7 +34,7 @@ services:
       context: frontend
       dockerfile: compose/production/Dockerfile
     ports:
-      - 80:80
+      - 1337:80
     depends_on:
       - backend
     env_file:
