@@ -1,10 +1,8 @@
 import axios from "axios";
 import Cookie from 'js-cookie';
 
-
-const url = process.env.REACT_APP_API_URL+ process.env.REACT_APP_PORT+"/api/contest"
-const urlBanner = process.env.REACT_APP_API_URL+ process.env.REACT_APP_PORT+"/api/banner"
-
+const url = process.env.REACT_APP_API_URL + process.env.REACT_APP_PORT + "/api/contest"
+const urlBanner = process.env.REACT_APP_API_URL + process.env.REACT_APP_PORT + "/api/banner"
 
 export async function get_contest_detail(id){
     let answer = await axios.get(url+"/"+id); 

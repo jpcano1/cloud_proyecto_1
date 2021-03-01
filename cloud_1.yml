@@ -5,22 +5,9 @@ networks:
     driver: bridge
   
 volumes:
-  local_postgres_data: {}
-  local_postgres_data_backups: {}
   voice_data: {}
 
 services:
-  db:
-    image: postgres
-    container_name: cloud_db
-    volumes:
-      - local_postgres_data:/var/lib/postgresql/data
-      - local_postgres_data_backups:/backups
-    env_file:
-      - backend/env/development/postgres
-    networks:
-      - cloud_network
-
   backend: &backend
     container_name: cloud_backend
     image: prod_cloud_backend

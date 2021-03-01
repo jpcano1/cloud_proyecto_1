@@ -7,15 +7,10 @@ ADD package.json $APP_DIR
 ADD src $APP_DIR/src
 ADD public $APP_DIR/public
 
-RUN apt-get update && apt full-upgrade -y && \
-        apt-get install -y --no-install-recommends \
-        git \
-        vim \
-        && \
-        apt-get clean && \
-        rm -rf /var/lib/apt/lists/*
-
 RUN npm install --silent
+
+ENV REACT_APP_API_URL http://0.0.0.0:
+ENV REACT_APP_PORT 80
 
 RUN npm run build
 
