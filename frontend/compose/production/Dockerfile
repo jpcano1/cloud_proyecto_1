@@ -9,8 +9,8 @@ ADD public $APP_DIR/public
 
 RUN npm install --silent
 
-ENV REACT_APP_API_URL http://0.0.0.0:
-ENV REACT_APP_PORT 80
+ENV REACT_APP_API_URL ${REACT_APP_API_URL}
+ENV REACT_APP_PORT ${REACT_APP_PORT}
 
 RUN npm run build
 
