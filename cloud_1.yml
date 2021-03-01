@@ -26,8 +26,6 @@ services:
     command: /app/start
     networks:
       - cloud_network
-    depends_on:
-      - db
 
   frontend:
     container_name: cloud_frontend
@@ -41,7 +39,6 @@ services:
       - 80:80
     depends_on:
       - backend
-      - db
     networks:
       - cloud_network
 
