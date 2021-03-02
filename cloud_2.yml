@@ -1,0 +1,70 @@
+version: "3"
+
+networks:
+  cloud_network:
+    driver: bridge
+  
+volumes:
+  voice_data:
+    driver: vieux/sshfs:latest
+    driver_opts:
+      sshcmd: "ubuntu@${REMOTE_HOST}:${REMOTE_DATA}"
+      password: "${HOST_PASS}"
+      allow_other: ""
+
+services:
+  backend: &backend
+    container_name: cloud_backend
+    image: prod_cloud_backend
+    build:
+      context: backend
+      dockerfile: compose/production/app/Dockerfile
+    env_file:
+      - backend/env/production/app
+      - backend/env/production/postgres
+    volumes:
+      - voice_data:/app/src
+    ports:
+      - 5000:5000
+    expose:
+      - 5000
+    command: /app/start
+    networks:
+      - cloud_network
+
+  frontend:
+    container_name: cloud_frontend
+    image: prod_cloud_frontend
+    build:
+      context: frontend
+      dockerfile: compose/production/Dockerfile
+    ports:
+      - 3000:80
+    depends_on:
+      - backend
+    networks:
+      - cloud_network
+
+  celery_worker:
+    <<: *backend
+    image: prod_cloud_celery_worker
+    container_name: cloud_celery_worker
+    depends_on:
+      - redis
+    ports: []
+    command: /app/celery_worker_start
+
+  celery_beat:
+    <<: *backend
+    image: prod_cloud_celery_beat
+    container_name: cloud_celery_beat
+    depends_on:
+      - redis
+    ports: []
+    command: /app/celery_beat_start
+
+  redis:
+    image: redis
+    container_name: cloud_redis
+    networks:
+      - cloud_network
