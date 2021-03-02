@@ -15,9 +15,8 @@ volumes:
     driver: local
     driver_opts:
       type: "nfs"
-      o: "addr=${REMOTE_HOST},rw,nfsvers=4,async"
+      o: "addr=${REMOTE_HOST},username=ubuntu,password=${HOST_PASS},rw,nfsvers=4,async"
       device: ":${REMOTE_DATA}"
-      password: "${HOST_PASS}"
 
 services:
   backend: &backend
