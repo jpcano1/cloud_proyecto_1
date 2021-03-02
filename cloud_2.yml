@@ -11,12 +11,17 @@ volumes:
   #     sshcmd: "ubuntu@${REMOTE_HOST}:${REMOTE_DATA}"
   #     password: "${HOST_PASS}"
   #     allow_other: ""
+  # voice_data:
+  #   driver: local
+  #   driver_opts:
+  #     type: "nfs"
+  #     o: "addr=${REMOTE_HOST},username=ubuntu,password=${HOST_PASS},rw,nfsvers=4,async"
+  #     device: ":${REMOTE_DATA}"
   voice_data:
-    driver: local
     driver_opts:
-      type: "nfs"
-      o: "addr=${REMOTE_HOST},username=ubuntu,password=${HOST_PASS},rw,nfsvers=4,async"
-      device: ":${REMOTE_DATA}"
+      type: cifs
+      device: //${REMOTE_HOST}/${REMOTE_DATA}
+      o: "addr=${REMOTE_HOST},username=ubuntu,password=${HOST_PASS},file_mode=0777,dir_mode=0777"
 
 services:
   backend: &backend
