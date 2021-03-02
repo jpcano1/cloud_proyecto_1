@@ -5,12 +5,19 @@ networks:
     driver: bridge
   
 volumes:
+  # voice_data:
+  #   driver: vieux/sshfs:latest
+  #   driver_opts:
+  #     sshcmd: "ubuntu@${REMOTE_HOST}:${REMOTE_DATA}"
+  #     password: "${HOST_PASS}"
+  #     allow_other: ""
   voice_data:
-    driver: vieux/sshfs:latest
+    driver: local
     driver_opts:
-      sshcmd: "ubuntu@${REMOTE_HOST}:${REMOTE_DATA}"
+      type: "nfs"
+      o: "addr=${REMOTE_HOST},rw,nfsvers=4,async"
+      device: ":${REMOTE_DATA}"
       password: "${HOST_PASS}"
-      allow_other: ""
 
 services:
   backend: &backend
