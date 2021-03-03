@@ -1,11 +1,17 @@
-version: "3"
+version: "3.7"
 
 networks:
   cloud_network:
     driver: bridge
   
 volumes:
-  voice_data: {}
+  voice_data:
+    name: "voice_data"
+    driver: vieux/sshfs:latest
+    driver_opts:
+      sshcmd: ${USER}@${HOST}:${DATA_DIR}
+      password: ${USER_PASSWD}
+      allow_other: ""
 
 services:
   backend: &backend
