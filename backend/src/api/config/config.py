@@ -16,15 +16,10 @@ class Config(object):
     CELERY_SCHEDULE_TIME = int(os.getenv("CELERY_SCHEDULE_TIME", 15))
 
 class ProductionConfig(Config):
-    POSTGRES_USERNAME = os.getenv("POSTGRES_USER")
-    POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
-    POSTGRES_HOST = os.getenv("POSTGRES_HOST")
-    POSTGRES_DB = os.getenv("POSTGRES_DB")
+    SECRET_KEY = os.getenv("SECRET_KEY", "cfiG7j1LOu")
+    SECURITY_PASSWORD_SALT = os.getenv("SECURITY_PASSWORD_SALT", "cfiG7j1LOu")
 
-    SECRET_KEY = os.getenv("SECRET_KEY", None)
-    SECURITY_PASSWORD_SALT = os.getenv("SECURITY_PASSWORD_SALT", None)
-
-    SQLALCHEMY_DATABASE_URI = f"postgresql://{POSTGRES_USERNAME}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:5432/{POSTGRES_DB}"
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URI", "sqlite:///" + os.path.abspath("example.db"))
 
     MAIL_DEFAULT_SENDER = os.getenv("EMAIL_SENDER")
     MAIL_SERVER = os.getenv("EMAIL_SERVER")
