@@ -16,6 +16,7 @@ services:
     volumes:
       - local_data:/app/wsgi.py
       - local_data:/app/src
+      - local_data:/app/cloud_1.db
     ports:
       - 5000:5000
     command: /app/start
