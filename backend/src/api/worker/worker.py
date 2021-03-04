@@ -2,6 +2,7 @@ from celery import Celery
 from dotenv import load_dotenv, find_dotenv
 from datetime import timedelta
 from flask import Flask
+import os
 
 load_dotenv(find_dotenv())
 
@@ -25,6 +26,8 @@ def init_app(app: Flask):
             "schedule": timedelta(seconds=app.config["CELERY_SCHEDULE_TIME"])
         }
     }
+
+    celery_app.conf.work_env = os.getenv("WORK_ENV", "DEV")
 
     # The task base app
     TaskBase = celery_app.Task

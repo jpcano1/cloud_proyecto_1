@@ -39,28 +39,10 @@ class DevelopmentConfig(Config):
     SQLALCHEMY_ECHO = False
     SQLITE_DB = os.getenv("SQLITE_DB", "example.db")
 
-    if os.getenv("ENGINE", "sqlite") == "postgres":
-        POSTGRES_USERNAME = os.getenv("POSTGRES_USER")
-        POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
-        POSTGRES_HOST = os.getenv("POSTGRES_HOST")
-        POSTGRES_DB = os.getenv("POSTGRES_DB")
-
-        SQLALCHEMY_DATABASE_URI = f"postgresql://{POSTGRES_USERNAME}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:5432/{POSTGRES_DB}"
-
-    else:
-        SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.abspath(SQLITE_DB)
+    SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.abspath(SQLITE_DB)
 
     SECRET_KEY = "cfiG7j1LOu"
     SECURITY_PASSWORD_SALT = "DukVKGDuJk"
-
-    MAIL_DEFAULT_SENDER = os.getenv("EMAIL_SENDER")
-    MAIL_SERVER = os.getenv("EMAIL_SERVER")
-    MAIL_PORT = os.getenv("EMAIL_PORT")
-    MAIL_USERNAME = os.getenv("EMAIL_USERNAME")
-    MAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
-    MAIL_USE_TLS = os.getenv("EMAIL_USE_TLS")
-    MAIL_SUPPRESS_SEND = True
-    MAIL_DEBUG = False
 
 class TestingConfig(Config):
     pass

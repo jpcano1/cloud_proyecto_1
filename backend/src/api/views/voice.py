@@ -2,6 +2,7 @@
 from flask_restful import Resource
 from flask import request, current_app
 import flask_sqlalchemy as fs
+from flask_jwt_extended import jwt_required
 
 # Models and Utils Imports
 from ..models import Voice as VoiceModel
@@ -111,6 +112,7 @@ class VoiceDetail(Resource):
             "voice": voice
         })
 
+    @jwt_required()
     def delete(self, voice_id):
         """
         Deletes a voice from the database
@@ -127,11 +129,12 @@ class VoiceDetail(Resource):
             })
 
         # Deletes the raw audio
-        if fetched.raw_audio != "":
+        if fetched.raw_audio != "" and os.path.exists(fetched.raw_audio[1:]):
             os.remove(fetched.raw_audio[1:])
 
         # Deletes converted audio
-        if fetched.converted and fetched.converted_audio != "":
+        if (fetched.converted and fetched.converted_audio != ""
+                and os.path.exists(fetched.converted_audio[1:])):
             os.remove(fetched.converted_audio[1:])
 
         db.session.delete(fetched)
