@@ -36,5 +36,5 @@ RUN apt-get update && apt full-upgrade -y && \
         rm -rf /var/lib/apt/lists/*
 
 RUN pip install -q --upgrade pip
-RUN pip install -q -r dev.txt
+RUN pip install -q -r prod.txt
 RUN pip install -q unittest2
