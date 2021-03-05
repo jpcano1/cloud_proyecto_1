@@ -72,7 +72,7 @@ class Contest(Resource):
                                  error="Missing Fields: " + ", ".join(a))
         except IntegrityError:
             return response_with(responses.INVALID_FIELD_NAME_SENT_422,
-                                 error="Invalid url or user")
+                                 error="Invalid field")
         except Exception as e:
             return response_with(responses.INVALID_INPUT_422,
                                  error=str(e))

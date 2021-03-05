@@ -24,6 +24,17 @@ class Contest(db.Model):
     voices = db.relationship("Voice", backref="Contest",
                              cascade="all, delete-orphan")
 
+    def __init__(self, name, url, begin_date, end_date,
+                 prize, script, recommendations, admin):
+        self.name = name
+        self.url = url
+        self.begin_date = begin_date
+        self.end_date = end_date
+        self.prize = prize
+        self.script = script
+        self.recommendations = recommendations
+        self.admin = admin
+
     def create(self):
         """
         Creates the contest in the database

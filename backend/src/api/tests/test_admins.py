@@ -13,7 +13,7 @@ def create_admins():
         name="Name 2", last_name="Last Name 2",
         email="name_2@email.com",
         password=Admin.generate_hash("name_last_name_2")
-    )
+    ).create()
 
 class TestAdmins(BaseTestCase):
     def setUp(self):
@@ -115,6 +115,15 @@ class TestAdmins(BaseTestCase):
         data = json.loads(response.data)
         self.assertEqual(422, response.status_code)
         self.assertTrue("password" in data["errors"])
+
+    def test_get_admin(self):
+        response = self.app.get(
+            "/api/admin"
+        )
+
+        data = json.loads(response.data)
+        self.assertEqual(2, len(data["admins"]))
+        self.assertEqual(200, response.status_code)
 
     def tearDown(self):
         super(TestAdmins, self).tearDown()
