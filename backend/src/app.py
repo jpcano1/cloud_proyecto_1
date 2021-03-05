@@ -1,5 +1,5 @@
 # Flask Configurations
-from flask import Flask, send_from_directory
+from flask import send_from_directory
 from flask_bcrypt import Bcrypt
 from flask_restful import Api
 from flask_cors import CORS
@@ -12,7 +12,7 @@ from src.api.config import (DevelopmentConfig,
 from src.api.worker import init_app
 
 # Database Configurations
-from src.api.utils import db, mail
+from src.api.utils import db, mail, create_app
 
 # OS Configurations
 import os, sys
@@ -32,8 +32,6 @@ logging.basicConfig(
     level=logging.DEBUG
 )
 
-app = Flask(__name__)
-
 if os.getenv("WORK_ENV") == "PROD":
     app_config = ProductionConfig
 elif os.getenv("WORK_ENV") == "TEST":
@@ -41,7 +39,7 @@ elif os.getenv("WORK_ENV") == "TEST":
 else:
     app_config = DevelopmentConfig
 
-app.config.from_object(app_config)
+app = create_app(app_config)
 
 if not os.path.exists("src/" + app.config["BANNERS_FOLDER"]):
     os.makedirs("src/" + app.config["BANNERS_FOLDER"])

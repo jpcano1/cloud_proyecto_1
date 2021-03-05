@@ -1,18 +1,30 @@
+# Main utils
 flask
 flask-sqlalchemy
 flask-marshmallow
 sqlalchemy
 marshmallow_sqlalchemy
-psycopg2
+
+# Miscellaneous
 python-dotenv
 marshmallow
 marshmallow-enum
 flask-jwt-extended
 Flask-Mail
 werkzeug
+
+# Flask utils
 flask-restful
 flask-bcrypt
 flask-cors
+celery[redis]
+
+# Production libraries
 wheel
 gunicorn
-celery[redis]
+
+# Database utils
+psycopg2
+
+# Testing libraries
+unittest2

@@ -40,4 +40,16 @@ class DevelopmentConfig(Config):
     SECURITY_PASSWORD_SALT = "DukVKGDuJk"
 
 class TestingConfig(Config):
-    pass
+    TESTING = True
+
+    SECRET_KEY = "XrUQdcNsJc"
+    SECURITY_PASSWORD_SALT = "Tz5XFmQCvJ"
+
+    MAIL_DEFAULT_SENDER = os.getenv("EMAIL_SENDER")
+    MAIL_SERVER = "smtp.gmail.com"
+    MAIL_PORT = 465
+    MAIL_USERNAME = os.getenv("EMAIL_USERNAME")
+    MAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+    MAIL_USE_TLS = False
+    MAIL_USER_SSL = True
+    MAIL_DEBUG = False
