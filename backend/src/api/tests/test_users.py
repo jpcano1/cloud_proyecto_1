@@ -1,5 +1,5 @@
 import json
-from ..utils import BaseTestCase
+from ..utils.test_base import BaseTestCase
 from ..models import Admin
 import unittest2 as unittest
 
