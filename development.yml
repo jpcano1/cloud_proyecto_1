@@ -1,7 +1,8 @@
-version: "3"
+version: "3.7"
 
 volumes:
-  local_data: {}
+  voice_data: 
+    name: "voice_data"
 
 services:
   backend: &backend
@@ -14,9 +15,9 @@ services:
       - backend/env/development/app
       - backend/env/development/postgres
     volumes:
-      - local_data:/app/wsgi.py
-      - local_data:/app/src
-      - local_data:/app/cloud_1.db
+      - voice_data:/app/wsgi.py
+      - voice_data:/app/src
+      - voice_data:/app/cloud_1.db
     ports:
       - 5000:5000
     command: /app/start

@@ -1,13 +1,16 @@
-version: "3"
+version: "3.7"
 
 networks:
   cloud_network:
     driver: bridge
   
 volumes:
-  local_postgres_data: {}
-  local_postgres_data_backups: {}
-  voice_data: {}
+  local_postgres_data:
+    name: "local_postgres_data"
+  local_postgres_data_backups: 
+    name: "local_postgres_data_backups"
+  voice_data:
+    name: "voice_data"
 
 services:
   db:

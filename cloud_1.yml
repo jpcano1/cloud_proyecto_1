@@ -1,11 +1,12 @@
-version: "3"
+version: "3.7"
 
 networks:
   cloud_network:
     driver: bridge
   
 volumes:
-  voice_data: {}
+  voice_data:
+    name: "voice_data"
 
 services:
   backend: &backend
