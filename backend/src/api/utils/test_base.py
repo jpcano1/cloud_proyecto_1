@@ -1,6 +1,7 @@
 import unittest2 as unittest
 from ..config import TestingConfig
-from . import db, create_app
+from . import db
+from ...app import create_app
 import tempfile
 import os
 
