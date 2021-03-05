@@ -21,9 +21,6 @@ ADD compose/production/celery/beat/start $APP_DIR/celery_beat_start
 RUN sed -i 's/\r//' $APP_DIR/celery_beat_start
 RUN chmod +x $APP_DIR/celery_beat_start
 
-RUN rm -r $APP_DIR/src/api/tests
-RUN rm $APP_DIR/src/api/utils/test_base.py
-
 ENV PYTHONUNBUFFERED 1
 ENV LANG C.UTF-8
 ENV DEBIAN_FRONTEND=noninteractive
@@ -38,5 +35,6 @@ RUN apt-get update && apt full-upgrade -y && \
         apt-get clean && \
         rm -rf /var/lib/apt/lists/*
 
-RUN pip install --upgrade pip
-RUN pip install -r prod.txt
+RUN pip install -q --upgrade pip
+RUN pip install -q -r dev.txt
+RUN pip install -q unittest2
