@@ -18,6 +18,12 @@ class Admin(db.Model):
     password = db.Column(db.String(255), nullable=False)
     contests = db.relationship("Contest", backref="Admin", cascade="all, delete-orphan")
 
+    def __init__(self, name, last_name, email, password):
+        self.name = name
+        self.last_name = last_name
+        self.email = email
+        self.password = password
+
     def create(self):
         """
         Creates the admin in the database

@@ -30,9 +30,8 @@ class SignUp(Resource):
 
         # The user already exists
         except IntegrityError:
-            return response_with(responses.INVALID_FIELD_NAME_SENT_422, value={
-                "error_message": "Email already exists"
-            })
+            return response_with(responses.INVALID_FIELD_NAME_SENT_422,
+                                 error="Email already exists")
         # The body is incomplete
         except KeyError:
             return response_with(responses.MISSING_PARAMETERS_422,
@@ -46,7 +45,7 @@ class SignUp(Resource):
         except Exception as e:
             return response_with(responses.INVALID_INPUT_422, error=str(e))
 
-        return response_with(responses.SUCCESS_200, value={
+        return response_with(responses.SUCCESS_201, value={
             "message": "Admin created"
         })
 

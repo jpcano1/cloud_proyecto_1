@@ -28,3 +28,4 @@ psycopg2
 
 # Testing libraries
 unittest2
+nose
