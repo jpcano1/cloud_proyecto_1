@@ -120,5 +120,14 @@ class TestContests(BaseTestCase):
 
         self.assertEqual(422, response.status_code)
 
+    def test_get_contest(self):
+        response = self.app.get(
+            "/api/contest",
+        )
+
+        data = json.loads(response.data)
+        self.assertEqual(2, len(data["contests"]))
+        self.assertEqual(200, response.status_code)
+
 if __name__ == "__main__":
     unittest.main()
