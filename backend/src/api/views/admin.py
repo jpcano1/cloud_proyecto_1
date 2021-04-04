@@ -1,12 +1,13 @@
 from flask_restful import Resource
-from flask import request
-from ..utils import db, responses, response_with
+from flask import request, render_template, current_app
+from ..utils import db, responses, response_with, send_email
 from ..models import Admin as AdminModel
 from ..models import AdminSchema
 from sqlalchemy.exc import IntegrityError
 from datetime import timedelta
 from flask_jwt_extended import create_access_token
 from marshmallow.exceptions import ValidationError
+from datetime import datetime
 
 class SignUp(Resource):
     def post(self):
@@ -72,6 +73,18 @@ class Login(Resource):
             identity=str(current_user.id),
             expires_delta=expires
         )
+
+        # user_agent = request.user_agent
+
+        # if current_app.config["WORK_ENV"] == "PROD":
+        #     template = render_template(
+        #         "email_templates/login_email.html",
+        #         platform=user_agent.platform,
+        #         browser=user_agent.browser,
+        #         time=datetime.now()
+        #     )
+        #
+        #     send_email(data.get("email"), "Login Notification", template)
         return response_with(responses.SUCCESS_200, value={
             "admin_id": current_user.id,
             "access_token": access_token,
