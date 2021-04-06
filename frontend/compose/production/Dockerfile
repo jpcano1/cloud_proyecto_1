@@ -7,7 +7,7 @@ ADD package.json $APP_DIR
 ADD src $APP_DIR/src
 ADD public $APP_DIR/public
 
-RUN npm install --silent
+RUN npm install
 
 ENV REACT_APP_API_URL ${REACT_APP_API_URL}
 ENV REACT_APP_PORT ${REACT_APP_PORT}
