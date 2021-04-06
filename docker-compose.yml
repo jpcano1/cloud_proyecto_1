@@ -9,7 +9,7 @@ volumes:
     name: "voice_data"
     driver: vieux/sshfs:latest
     driver_opts:
-      sshcmd: ${USER}@${HOST}:${DATA_DIR}
+      sshcmd: docker-nfs@172.31.45.103:/home/docker-nfs/src
       password: ${USER_PASSWD}
       allow_other: ""
 
