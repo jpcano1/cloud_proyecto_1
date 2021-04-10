@@ -108,9 +108,5 @@ def create_app(app_config_):
     return app
 
 app = create_app(app_config)
-
 celery_app = init_app(app)
-
 db.init_app(app)
-with app.app_context():
-    db.create_all()

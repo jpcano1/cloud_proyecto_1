@@ -1,4 +1,3 @@
-from flask_sqlalchemy import SQLAlchemy
+from flask_pymongo import PyMongo
 
-# DB Creation for Singleton Pattern initialization
-db: SQLAlchemy = SQLAlchemy()
+db: PyMongo = PyMongo()
