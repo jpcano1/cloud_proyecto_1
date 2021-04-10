@@ -23,9 +23,8 @@ celery[redis]
 wheel
 gunicorn
 
-# Database utils
-psycopg2
-
 # Testing libraries
 unittest2
 nose
+Flask-PyMongo
+pymongo

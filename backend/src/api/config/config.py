@@ -19,7 +19,7 @@ class ProductionConfig(Config):
     SECRET_KEY = os.getenv("SECRET_KEY", "cfiG7j1LOu")
     SECURITY_PASSWORD_SALT = os.getenv("SECURITY_PASSWORD_SALT", "cfiG7j1LOu")
 
-    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URI", "sqlite:///" + os.path.abspath("example.db"))
+    MONGO_URI = os.getenv("MONGO_URI")
 
     MAIL_DEFAULT_SENDER = os.getenv("EMAIL_SENDER")
     MAIL_SERVER = os.getenv("EMAIL_SERVER")
@@ -31,10 +31,8 @@ class ProductionConfig(Config):
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_ECHO = False
-    SQLITE_DB = os.getenv("SQLITE_DB", "example.db")
 
-    SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.abspath(SQLITE_DB)
+    MONGO_URI = os.getenv("MONGO_URI")
 
     SECRET_KEY = "cfiG7j1LOu"
     SECURITY_PASSWORD_SALT = "DukVKGDuJk"
