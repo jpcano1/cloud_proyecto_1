@@ -1,3 +1,6 @@
+from ..models import VoiceModel
+from datetime import datetime
+
 allowed_extensions = {
     "audio/ogg", "audio/wave",
     "audio/x-flac", "audio/mp4",
@@ -6,6 +9,19 @@ allowed_extensions = {
 }
 
 class VoiceController:
+    def __init__(self):
+        self.voice_model = VoiceModel()
+
+    def get(self, _id):
+        return self.voice_model.find_one(_id)
+
+    def list(self, contest_id):
+        return self.voice_model.find(contest_id)
+
+    def post(self, value: dict):
+        value["created"] = datetime.now()
+        return self.voice_model.create(value)
+
     @staticmethod
     def validate_format(format_):
         """

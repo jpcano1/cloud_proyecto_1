@@ -5,13 +5,8 @@ import flask_sqlalchemy as fs
 from flask_jwt_extended import jwt_required
 
 # Models and Utils Imports
-from ..models import Voice as VoiceModel
-from ..models import VoiceSchema
+from ..models import VoiceModel
 from ..utils import response_with, responses, db
-
-# Marshmallow imports
-from marshmallow.exceptions import ValidationError
-from sqlalchemy.exc import IntegrityError
 
 # Werkzeug utils
 from werkzeug.utils import secure_filename
@@ -49,20 +44,6 @@ class Voice(Resource):
         if the voices we're already converted
         :return: A 200 status code message
         """
-        page = request.args.get("page", 1, type=int)
-        if request.args.get("contest_id"):
-            fetched = VoiceModel.query.filter_by(
-                contest=request.args.get("contest_id")
-            )
-        else:
-            fetched = VoiceModel.query
-
-        fetched = fetched.order_by(
-            VoiceModel.created.desc()
-        ).paginate(
-            page=page,
-            max_per_page=50
-        )
 
         voice_schema = VoiceSchema(many=True)
         voices = voice_schema.dump(fetched.items)

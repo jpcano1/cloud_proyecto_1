@@ -3,13 +3,15 @@ from ..models import AdminModel, ContestModel
 allowed_extensions = {"image/jpeg", "image/png", "jpeg"}
 
 class ContestController:
-    def __init__(self, admin_id):
-        self.admin_id = admin_id
+    def __init__(self):
         self.admin_model = AdminModel()
         self.contest_model = ContestModel()
 
     def get(self, url):
-        return self.contest_model.find_one(url)
+        contest = self.contest_model.find_one(url)
+        if not contest:
+            raise ValueError("Resource does not exist")
+        return contest
 
     def list(self, admin_id):
         return self.contest_model.find(admin_id)
@@ -18,10 +20,14 @@ class ContestController:
         return self.contest_model.create(value)
 
     def update(self, url, admin_id, data):
-        return self.contest_model.update(url, admin_id, data)
+        result = self.contest_model.update(url, admin_id, data)
+        if result.matched_count < 1:
+            raise ValueError("Resource does not exist")
 
     def delete(self, url, admin_id):
-        return self.contest_model.delete(url, admin_id)
+        result = self.contest_model.delete(url, admin_id)
+        if result.deleted_count < 1:
+            raise ValueError("Resource does not exist")
 
     @staticmethod
     def validate_format(format_):
@@ -33,13 +39,3 @@ class ContestController:
         :rtype: bool
         """
         return format_ in allowed_extensions
-
-    def __call__(self, *args, **kwargs):
-        """
-        This function is called when the ContestController
-        object is called
-        :param args: The function arguments
-        :param kwargs: The function keyword arguments
-        :return: The result of the validation
-        """
-        return self.validate_format(*args)

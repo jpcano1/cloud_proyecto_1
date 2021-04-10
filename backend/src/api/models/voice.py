@@ -15,7 +15,12 @@ class VoiceModel:
             "contest_id": contest_id
         })
 
-    def update(self, _id, contest_id, value):
+    def find_one(self, _id):
+        return self.voices.find_one({
+            "_id": _id
+        })
+
+    def update(self, _id, contest_id, value: dict):
         return self.voices.update_one(
             {
                 "_id": _id,

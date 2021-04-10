@@ -1,15 +1,14 @@
 from flask_restful import Resource
-from flask import request, render_template, current_app
-from ..utils import db, responses, response_with, send_email
-from ..models import Admin as AdminModel
-from ..models import AdminSchema
-from sqlalchemy.exc import IntegrityError
+from flask import request
+from ..utils import db, responses, response_with
+from ..models import AdminModel
+from ..controllers import AdminController
 from datetime import timedelta
 from flask_jwt_extended import create_access_token
-from marshmallow.exceptions import ValidationError
-from datetime import datetime
 
 class SignUp(Resource):
+    admin_controller = AdminController()
+
     def post(self):
         """
         Creates an admin to the database
@@ -23,57 +22,41 @@ class SignUp(Resource):
         missing fields
         """
         data = request.get_json()
-        admin_schema = AdminSchema()
         try:
-            data["password"] = AdminModel.generate_hash(data["password"])
-            admin = admin_schema.load(data, session=db.session)
-            admin.create()
+            result = self.admin_controller.signup(data)
 
         # The user already exists
-        except IntegrityError:
+        except ValueError as e:
             return response_with(responses.INVALID_FIELD_NAME_SENT_422,
-                                 error="Email already exists")
+                                 error=e)
         # The body is incomplete
         except KeyError:
             return response_with(responses.MISSING_PARAMETERS_422,
-                                 error="Missing Fields: password")
-        # Missing fields
-        except ValidationError as e:
-            a = e.messages.keys()
-            return response_with(responses.MISSING_PARAMETERS_422,
-                                 error="Missing Fields: " + ", ".join(a))
+                                 error="Missing Fields")
         # General exception
         except Exception as e:
             return response_with(responses.INVALID_INPUT_422, error=str(e))
 
         return response_with(responses.SUCCESS_201, value={
-            "message": "Admin created"
+            "message": "Admin created",
+            "_id": result.inserted_id
         })
 
 class Login(Resource):
+    admin_controller = AdminController()
+
     def post(self):
         """
         Submits an admin info to login
         :return: The logged on admin user.
         """
         data = request.get_json()
-        current_user = AdminModel.find_by_email(data.get("email"))
 
-        if not current_user:
+        try:
+            current_user = self.admin_controller.login(data)
+        except ValueError as e:
             return response_with(responses.INVALID_FIELD_NAME_SENT_422,
-                                 error="Wrong email or password")
-        verification = AdminModel.verify_hash(current_user.password,
-                                              data["password"])
-        if not verification:
-            return response_with(responses.INVALID_FIELD_NAME_SENT_422,
-                                 error="Wrong email or password")
-        # JWT with 2 hours validity
-        expires = timedelta(hours=2)
-        access_token = create_access_token(
-            identity=str(current_user.id),
-            expires_delta=expires
-        )
-
+                                 error=e)
         # user_agent = request.user_agent
 
         # if current_app.config["WORK_ENV"] == "PROD":
@@ -86,12 +69,13 @@ class Login(Resource):
         #
         #     send_email(data.get("email"), "Login Notification", template)
         return response_with(responses.SUCCESS_200, value={
-            "admin_id": current_user.id,
-            "access_token": access_token,
-            "message": f"Logged in as {current_user.name}"
+            "admin_id": current_user["admin_id"],
+            "access_token": current_user["access_token"],
         })
 
 class Admin(Resource):
+    admin_controller = AdminController()
+
     def get(self):
         """
         Retrieves all the admins of the database
@@ -106,15 +90,20 @@ class Admin(Resource):
         })
 
 class AdminDetail(Resource):
+    admin_controller = AdminController()
+
     def get(self, admin_id):
         """
         Retrieves the list of admins
         :param admin_id: The id of the admin to retrieve
         :return: The admin retrieved
         """
-        fetched = AdminModel.query.get_or_404(admin_id)
-        admin_schema = AdminSchema()
-        admin = admin_schema.dump(fetched)
+        try:
+            fetched_admin = self.admin_controller.get(admin_id)
+        except ValueError as e:
+            return response_with(responses.SERVER_ERROR_404,
+                                 error=e)
+
         return response_with(responses.SUCCESS_200, value={
-            "admin": admin
+            "admin": fetched_admin
         })
