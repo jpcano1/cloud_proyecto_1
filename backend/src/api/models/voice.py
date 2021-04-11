@@ -1,3 +1,6 @@
+import pymongo
+from datetime import datetime
+
 from ..utils import db
 from pymongo.collection import Collection
 
@@ -8,12 +11,20 @@ class VoiceModel:
         Creates the voice in the database
         :return: The voice created
         """
+        value["created"] = datetime.now()
         return self.voices.insert_one(value)
 
     def find(self, contest_id):
-        return self.voices.find({
-            "contest_id": contest_id
-        })
+        if contest_id:
+            result = self.voices.find({
+                "contest_id": contest_id
+            })
+        else:
+            result = self.voices.find({})
+        return result.sort(
+            "created",
+            pymongo.DESCENDING
+        )
 
     def find_one(self, _id):
         return self.voices.find_one({

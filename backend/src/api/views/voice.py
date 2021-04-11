@@ -1,7 +1,6 @@
 # Flask Imports
 from flask_restful import Resource
 from flask import request, current_app
-import flask_sqlalchemy as fs
 from flask_jwt_extended import jwt_required
 
 # Models and Utils Imports
@@ -14,12 +13,15 @@ import werkzeug as werk
 
 # OS Imports
 import os
+import pymongo
 
 from ..controllers import VoiceController
 
 class Voice(Resource):
+    voice_controller = VoiceController()
+
     @staticmethod
-    def paginated_voices(results, pagination: fs.Pagination):
+    def paginated_voices(results: pymongo.cursor.Cursor, page_num):
         """
         This methods paginates the voices list
         :param results: The results from the queried voices
@@ -28,15 +30,14 @@ class Voice(Resource):
         :type pagination: fs.Pagination
         :return: The response body
         """
-        prev_page = pagination.prev_num
-        next_page = pagination.next_num
-        value = {
-            "count": pagination.pages,
-            "previous": request.path + f"?page={prev_page}" if prev_page else None,
-            "next": request.path + f"?page={next_page}" if next_page else None,
-            "voices": results,
-        }
-        return value
+        skips = 50 * (page_num - 1)
+        # value = {
+        #     "count": results.,
+        #     "previous": request.path + f"?page={prev_page}" if prev_page else None,
+        #     "next": request.path + f"?page={next_page}" if next_page else None,
+        #     "voices": results,
+        # }
+        return {}
 
     def get(self):
         """
@@ -44,14 +45,15 @@ class Voice(Resource):
         if the voices we're already converted
         :return: A 200 status code message
         """
+        contest_id = request.args.get("contest_id", None)
+        result = self.voice_controller.list(contest_id)
 
-        voice_schema = VoiceSchema(many=True)
-        voices = voice_schema.dump(fetched.items)
-
-        value = self.paginated_voices(voices, fetched)
+        # value = self.paginated_voices(voices, fetched)
 
         return response_with(responses.SUCCESS_200,
-                             value=value)
+                             value={
+                                 "voices": result
+                             })
 
     def post(self):
         """
@@ -61,24 +63,15 @@ class Voice(Resource):
         :return: A 200 status code message
         """
         data = request.get_json()
-        voice_schema = VoiceSchema()
-
-        try:
-            voice: VoiceModel = voice_schema.load(data, session=db.session)
-            result = voice_schema.dump(voice.create())
-        except ValidationError as e:
-            a = e.messages.keys()
-            return response_with(responses.MISSING_PARAMETERS_422,
-                                 error="Missing Fields: " + ", ".join(a))
-        except IntegrityError:
-            return response_with(responses.INVALID_INPUT_422,
-                                 error="The contest doesn't exist")
+        result = self.voice_controller.post(data)
         return response_with(responses.SUCCESS_200, value={
             "message": "Voice uploaded!",
-            "voice": result
+            "voice": result.inserted_id
         })
 
 class VoiceDetail(Resource):
+    voice_controller = VoiceController()
+
     def get(self, voice_id):
         """
         Fetches a single voice from the database
@@ -86,41 +79,43 @@ class VoiceDetail(Resource):
         :param voice_id: The id of the voice
         :return: A 200 status code message
         """
-        fetched = VoiceModel.query.get_or_404(voice_id)
-        voice_schema = VoiceSchema()
-        voice = voice_schema.dump(fetched)
-        return response_with(responses.SUCCESS_200, value={
-            "voice": voice
-        })
-
-    @jwt_required()
-    def delete(self, voice_id):
-        """
-        Deletes a voice from the database
-        :param voice_id: The id of the voice to be deleted
-        :return: A 204 status code message
-        """
-        # Fetches the voice, if it's not found,
-        # it returns a 404 status code message
-        fetched: VoiceModel = VoiceModel.query.get_or_404(voice_id)
-
-        if not fetched:
-            return response_with(responses.SERVER_ERROR_404, value={
-                "error_message": "Resource does not exist"
+        try:
+            voice = self.voice_controller.get(voice_id)
+            return response_with(responses.SUCCESS_200, value={
+                "voice": voice
             })
+        except ValueError as e:
+            return response_with(responses.SERVER_ERROR_404,
+                                 error=e)
 
-        # Deletes the raw audio
-        if fetched.raw_audio != "" and os.path.exists(fetched.raw_audio[1:]):
-            os.remove(fetched.raw_audio[1:])
-
-        # Deletes converted audio
-        if (fetched.converted and fetched.converted_audio != ""
-                and os.path.exists(fetched.converted_audio[1:])):
-            os.remove(fetched.converted_audio[1:])
-
-        db.session.delete(fetched)
-        db.session.commit()
-        return response_with(responses.SUCCESS_204)
+    # @jwt_required()
+    # def delete(self, voice_id):
+    #     """
+    #     Deletes a voice from the database
+    #     :param voice_id: The id of the voice to be deleted
+    #     :return: A 204 status code message
+    #     """
+    #     # Fetches the voice, if it's not found,
+    #     # it returns a 404 status code message
+    #     fetched: VoiceModel = VoiceModel.query.get_or_404(voice_id)
+    #
+    #     if not fetched:
+    #         return response_with(responses.SERVER_ERROR_404, value={
+    #             "error_message": "Resource does not exist"
+    #         })
+    #
+    #     # Deletes the raw audio
+    #     if fetched.raw_audio != "" and os.path.exists(fetched.raw_audio[1:]):
+    #         os.remove(fetched.raw_audio[1:])
+    #
+    #     # Deletes converted audio
+    #     if (fetched.converted and fetched.converted_audio != ""
+    #             and os.path.exists(fetched.converted_audio[1:])):
+    #         os.remove(fetched.converted_audio[1:])
+    #
+    #     db.session.delete(fetched)
+    #     db.session.commit()
+    #     return response_with(responses.SUCCESS_204)
 
 class VoiceUpload(Resource):
     voice_controller = VoiceController()

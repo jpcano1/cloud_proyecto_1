@@ -1,5 +1,4 @@
 from ..models import VoiceModel
-from datetime import datetime
 
 allowed_extensions = {
     "audio/ogg", "audio/wave",
@@ -13,13 +12,15 @@ class VoiceController:
         self.voice_model = VoiceModel()
 
     def get(self, _id):
-        return self.voice_model.find_one(_id)
+        result =  self.voice_model.find_one(_id)
+        if not result:
+            raise ValueError("Resource not found")
+        return  result
 
     def list(self, contest_id):
         return self.voice_model.find(contest_id)
 
     def post(self, value: dict):
-        value["created"] = datetime.now()
         return self.voice_model.create(value)
 
     @staticmethod
