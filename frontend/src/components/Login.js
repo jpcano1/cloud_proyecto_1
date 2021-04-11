@@ -31,7 +31,7 @@ export default function Login(){
       event.preventDefault();
       let data = {"email": email, "password":password}; 
       let answer = await post_login(data);
-      if(typeof(answer)==='number'){
+      if(typeof(answer)==='string'){
           Cookie.set('admin', answer);
           history.push({pathname:"/contest"});
       }

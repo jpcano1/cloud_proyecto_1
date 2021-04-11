@@ -20,6 +20,7 @@ export async function post_contest(data){
     axios.defaults.headers.common['Authorization'] = 
     'Bearer ' + Cookie.get("access_token");
     let answer = await axios.post(url,data); 
+    console.log(answer)
     return answer.data; 
 }
 

@@ -67,7 +67,7 @@ export default function AdminMenu(){
         try{
           let answer = await post_contest(newContest);
           if(banner){
-            fileUpload(answer.contest.id)
+            fileUpload(url)
           }
           setShowCreateModal(false);
           fetchContest(); 
@@ -105,9 +105,8 @@ export default function AdminMenu(){
         newContest.begin_date = begin_date.getDate() + "/"+ begin_date.getMonth() + "/"+ begin_date.getFullYear();
         newContest.end_date = end_date.getDate() + "/"+ end_date.getMonth() + "/"+ end_date.getFullYear();
       }
-
       if(banner){
-        await fileUpload(contestSelected.id);
+        await fileUpload(contestSelected.url);
       }
       if(prize){
         newContest.prize = prize; 

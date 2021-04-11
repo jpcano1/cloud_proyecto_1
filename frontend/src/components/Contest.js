@@ -35,7 +35,7 @@ export default function Contest(props){
         }
         setContest(answer.contest); 
         fetchAudios();
-    },[contest.id])
+    },[contest._id])
 
     function validateForm(){
         return email.length > 0 && name.length > 0 & lastName.length > 0 && voice
@@ -44,7 +44,7 @@ export default function Contest(props){
          fetchAudios(value);
     }
     async function fetchAudios(page=1){
-      let answer = await get_voices(contest.id,page); 
+      let answer = await get_voices(contest._id,page); 
       if(!isLogged){
         console.log(answer);
         setAudios(answer.voices.filter((d) => d.converted));
@@ -60,9 +60,9 @@ export default function Contest(props){
         newVoice.last_name = lastName; 
         newVoice.email = email; 
         newVoice.observations = observations;
-        newVoice.contest = contest.id;
+        newVoice.contest_url = contest.url;
         let answer = await post_voice(newVoice); 
-        await uploadVoice(answer.id)
+        await uploadVoice(answer);
         await fetchAudios();
         setShowModalUpload(false);
         setShowModalNotify(true);
