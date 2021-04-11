@@ -1,6 +1,7 @@
 # Flask Imports
 from flask_restful import Resource
 from flask import request, current_app
+from flask_jwt_extended import jwt_required
 
 # Models and Utils Imports
 from ..models import VoiceModel
@@ -44,8 +45,8 @@ class Voice(Resource):
         if the voices we're already converted
         :return: A 200 status code message
         """
-        contest_id = request.args.get("contest_id", None)
-        result = self.voice_controller.list(contest_id)
+        contest_url = request.args.get("contest_url", None)
+        result = self.voice_controller.list(contest_url)
 
         # value = self.paginated_voices(voices, fetched)
 
@@ -65,7 +66,7 @@ class Voice(Resource):
         result = self.voice_controller.post(data)
         return response_with(responses.SUCCESS_200, value={
             "message": "Voice uploaded!",
-            "voice": result.inserted_id
+            "voice": str(result.inserted_id)
         })
 
 class VoiceDetail(Resource):
@@ -85,36 +86,33 @@ class VoiceDetail(Resource):
             })
         except ValueError as e:
             return response_with(responses.SERVER_ERROR_404,
-                                 error=e)
+                                 error=str(e))
 
-    # @jwt_required()
-    # def delete(self, voice_id):
-    #     """
-    #     Deletes a voice from the database
-    #     :param voice_id: The id of the voice to be deleted
-    #     :return: A 204 status code message
-    #     """
-    #     # Fetches the voice, if it's not found,
-    #     # it returns a 404 status code message
-    #     fetched: VoiceModel = VoiceModel.query.get_or_404(voice_id)
-    #
-    #     if not fetched:
-    #         return response_with(responses.SERVER_ERROR_404, value={
-    #             "error_message": "Resource does not exist"
-    #         })
-    #
-    #     # Deletes the raw audio
-    #     if fetched.raw_audio != "" and os.path.exists(fetched.raw_audio[1:]):
-    #         os.remove(fetched.raw_audio[1:])
-    #
-    #     # Deletes converted audio
-    #     if (fetched.converted and fetched.converted_audio != ""
-    #             and os.path.exists(fetched.converted_audio[1:])):
-    #         os.remove(fetched.converted_audio[1:])
-    #
-    #     db.session.delete(fetched)
-    #     db.session.commit()
-    #     return response_with(responses.SUCCESS_204)
+    @jwt_required()
+    def delete(self, voice_id):
+        """
+        Deletes a voice from the database
+        :param voice_id: The id of the voice to be deleted
+        :return: A 204 status code message
+        """
+        # Fetches the voice, if it's not found,
+        # it returns a 404 status code message
+        # Deletes the raw audio
+        try:
+            fetched = self.voice_controller.get(voice_id)
+            if fetched["raw_audio"] != "" and os.path.exists(fetched["raw_audio"][1:]):
+                os.remove(fetched["raw_audio"][1:])
+
+            # Deletes converted audio
+            if (fetched["converted"] and fetched["converted_audio"] != ""
+                    and os.path.exists(fetched["converted_audio"][1:])):
+                os.remove(fetched["converted_audio"][1:])
+
+            self.voice_controller.delete(voice_id)
+        except ValueError as e:
+            return response_with(responses.SERVER_ERROR_404,
+                                 error=str(e))
+        return response_with(responses.SUCCESS_204)
 
 class VoiceUpload(Resource):
     voice_controller = VoiceController()
@@ -134,8 +132,7 @@ class VoiceUpload(Resource):
                                          error="File type not allowed")
                 elif file and self.voice_controller.validate_format(file.content_type):
                     filename = secure_filename("_".join([
-                        str(fetched.id), fetched.name,
-                        fetched.last_name, file.filename
+                        str(fetched["_id"]), file.filename
                     ]))
                     # Saves it in the directory
                     file.save(os.path.join(
@@ -167,4 +164,4 @@ class VoiceUpload(Resource):
                           error="Voice already has audio file")
         except ValueError as e:
             return response_with(responses.SERVER_ERROR_404,
-                                 error=e)
+                                 error=str(e))

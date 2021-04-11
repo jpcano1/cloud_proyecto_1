@@ -1,10 +1,12 @@
 from celery import current_app
-from ..models import VoiceModel
-from ..utils import db, send_email
+from ..controllers import VoiceController
+from ..utils import send_email
 from flask import render_template
 import time
 import logging
 import os
+
+voice_controller = VoiceController()
 
 if not os.path.exists("src/static/logs"):
     os.makedirs("src/static/logs")
@@ -23,9 +25,7 @@ def retrieve():
     Retrieves all the non-converted voices
     :return: A collection of voices
     """
-    fetched = VoiceModel.query.filter_by(
-        converted=False
-    ).all()
+    fetched = voice_controller.get_non_converted()
 
     return fetched
 
@@ -80,19 +80,22 @@ def converter():
 
     counter = 0
     for voice in fetched_voices:
-        if voice.raw_audio:
+        if voice["raw_audio"] != "":
             # Start time
-            logger.info(f"{voice.id},begin,{time.time()}")
-            path = convert(voice.raw_audio)
+            logger.info(f"{str(voice['_id'])},begin,{time.time()}")
+            path = convert(voice["raw_audio"])
             # Log message
-            logger.info(f"{voice.id},end,{time.time()}")
-            voice.converted = True
-            voice.converted_audio = path
+            logger.info(f"{str(voice['_id'])},end,{time.time()}")
+            voice_controller.update(
+                str(voice['_id']),
+                value={
+                    "converted": True,
+                    "converted_audio": path
+                }
+            )
             # Update route
-            db.session.add(voice)
-            db.session.commit()
-            print(f"Voice: {voice.id} converted")
-            emails.append((voice.name, voice.email))
+            print(f"Voice: {str(voice['_id'])} converted")
+            emails.append((voice["name"], voice["email"]))
             counter += 1
 
     for name, email in emails:
