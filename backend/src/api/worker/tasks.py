@@ -1,5 +1,5 @@
 from celery import current_app
-from ..models import Voice as VoiceModel
+from ..models import VoiceModel
 from ..utils import db, send_email
 from flask import render_template
 import time

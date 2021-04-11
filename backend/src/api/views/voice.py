@@ -1,11 +1,10 @@
 # Flask Imports
 from flask_restful import Resource
 from flask import request, current_app
-from flask_jwt_extended import jwt_required
 
 # Models and Utils Imports
 from ..models import VoiceModel
-from ..utils import response_with, responses, db
+from ..utils import response_with, responses
 
 # Werkzeug utils
 from werkzeug.utils import secure_filename

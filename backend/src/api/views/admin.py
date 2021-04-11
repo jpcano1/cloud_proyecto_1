@@ -1,10 +1,8 @@
 from flask_restful import Resource
 from flask import request
-from ..utils import db, responses, response_with
-from ..models import AdminModel
+from ..utils import responses, response_with
 from ..controllers import AdminController
-from datetime import timedelta
-from flask_jwt_extended import create_access_token
+from bson.json_util import dumps
 
 class SignUp(Resource):
     admin_controller = AdminController()
@@ -28,7 +26,7 @@ class SignUp(Resource):
         # The user already exists
         except ValueError as e:
             return response_with(responses.INVALID_FIELD_NAME_SENT_422,
-                                 error=e)
+                                 error=str(e))
         # The body is incomplete
         except KeyError:
             return response_with(responses.MISSING_PARAMETERS_422,
@@ -36,10 +34,9 @@ class SignUp(Resource):
         # General exception
         except Exception as e:
             return response_with(responses.INVALID_INPUT_422, error=str(e))
-
         return response_with(responses.SUCCESS_201, value={
             "message": "Admin created",
-            "_id": result.inserted_id
+            "_id": str(result.inserted_id)
         })
 
 class Login(Resource):
@@ -82,11 +79,9 @@ class Admin(Resource):
         (will be deleted)
         :return: All the admins in the database
         """
-        fetched = AdminModel.query.all()
-        admin_schema = AdminSchema(many=True)
-        admins = admin_schema.dump(fetched)
+        fetched = self.admin_controller.list()
         return response_with(responses.SUCCESS_200, value={
-            "admins": admins
+            "admins": fetched
         })
 
 class AdminDetail(Resource):
@@ -102,7 +97,7 @@ class AdminDetail(Resource):
             fetched_admin = self.admin_controller.get(admin_id)
         except ValueError as e:
             return response_with(responses.SERVER_ERROR_404,
-                                 error=e)
+                                 error=str(e))
 
         return response_with(responses.SUCCESS_200, value={
             "admin": fetched_admin

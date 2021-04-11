@@ -5,13 +5,16 @@ from ..utils import db
 from pymongo.collection import Collection
 
 class VoiceModel:
-    voices: Collection = db.db.voices
+    voices: Collection = db.voices
     def create(self, value: dict):
         """
         Creates the voice in the database
         :return: The voice created
         """
         value["created"] = datetime.now()
+        value["converted"] = False
+        value["raw_audio"] = ""
+        value["converted_audio"] = ""
         return self.voices.insert_one(value)
 
     def find(self, contest_id):
@@ -33,8 +36,6 @@ class VoiceModel:
 
     def update(self, _id, value: dict):
         return self.voices.update_one(
-            {
-                "_id": _id,
-            },
-            value
+            {"_id": _id,},
+            {"$set": value}
         )

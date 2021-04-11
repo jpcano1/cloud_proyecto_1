@@ -18,9 +18,6 @@ from src.api.views import (SignUp, Admin, Contest, VoiceUpload,
                            BannerUpload, Login, ContestDetail,
                            Voice, VoiceDetail, AdminDetail)
 
-# App Creation
-from src.api.utils import db
-
 from src.api.worker import init_app
 
 # OS Configurations
@@ -93,20 +90,19 @@ def create_app(app_config_):
     api.add_resource(SignUp, "/api/signup")
     api.add_resource(Login, "/api/login")
     api.add_resource(Admin, "/api/admin")
-    api.add_resource(AdminDetail, "/api/admin/<int:admin_id>")
+    api.add_resource(AdminDetail, "/api/admin/<admin_id>")
 
     # Contest Routes
     api.add_resource(Contest, "/api/contest")
     api.add_resource(ContestDetail, "/api/contest/<url>")
-    api.add_resource(BannerUpload, "/api/banner/<int:contest_id>")
+    api.add_resource(BannerUpload, "/api/banner/<contest_url>")
 
     # Voice Routes
     api.add_resource(Voice, "/api/voice")
-    api.add_resource(VoiceDetail, "/api/voice/<int:voice_id>")
-    api.add_resource(VoiceUpload, "/api/voice_upload/<int:voice_id>")
+    api.add_resource(VoiceDetail, "/api/voice/<voice_id>")
+    api.add_resource(VoiceUpload, "/api/voice_upload/<voice_id>")
 
     return app
 
 app = create_app(app_config)
 celery_app = init_app(app)
-db.init_app(app)

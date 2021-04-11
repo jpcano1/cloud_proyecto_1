@@ -11,12 +11,16 @@ class ContestController:
         contest = self.contest_model.find_one(url)
         if not contest:
             raise ValueError("Resource does not exist")
-        return contest
+        return self.contest_model.to_dict(contest)
 
     def list(self, admin_id):
-        return self.contest_model.find(admin_id)
+        result = self.contest_model.find(admin_id)
+        return [self.contest_model.to_dict(x) for x in result]
 
     def post(self, value):
+        fetched = self.contest_model.find_one(value["url"])
+        if fetched:
+            raise ValueError("Invalid url")
         return self.contest_model.create(value)
 
     def update(self, url, admin_id, data):

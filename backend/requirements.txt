@@ -28,3 +28,4 @@ unittest2
 nose
 Flask-PyMongo
 pymongo
+dnspython

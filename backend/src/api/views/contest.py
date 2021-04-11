@@ -53,12 +53,15 @@ class Contest(Resource):
         # The identity of the creator admin
         data["admin_id"] = get_jwt_identity()
 
-        contest_created = self.contest_controller.post(data)
-        print(contest_created)
-        return response_with(responses.SUCCESS_200, value={
-            "message": "Contest created",
-            "contest": contest_created.inserted_id
-        })
+        try:
+            contest_created = self.contest_controller.post(data)
+            return response_with(responses.SUCCESS_200, value={
+                "message": "Contest created",
+                "contest": str(contest_created.inserted_id)
+            })
+        except ValueError as e:
+            return response_with(responses.INVALID_FIELD_NAME_SENT_422,
+                                 error=str(e))
 
 class ContestDetail(Resource):
     contest_controller = ContestController()
@@ -74,7 +77,7 @@ class ContestDetail(Resource):
             fetched = self.contest_controller.get(url)
         except ValueError as e:
             return response_with(responses.SERVER_ERROR_404,
-                                 error=e)
+                                 error=str(e))
         return response_with(responses.SUCCESS_200, value={
             "contest": fetched
         })
@@ -98,7 +101,7 @@ class ContestDetail(Resource):
             )
         except ValueError as e:
             return response_with(responses.SERVER_ERROR_404,
-                                 error=e)
+                                 error=str(e))
         return response_with(responses.SUCCESS_200, value={
             "message": "Contest updated"
         })
@@ -120,24 +123,24 @@ class ContestDetail(Resource):
             )
         except ValueError as e:
             return response_with(responses.SERVER_ERROR_404,
-                                 error=e)
+                                 error=str(e))
         return response_with(responses.SUCCESS_204)
 
 class BannerUpload(Resource):
     contest_controller = ContestController()
 
     @jwt_required()
-    def post(self, url):
+    def post(self, contest_url):
         """
         Updates the banner of the contest
-        :param url: The url of the existing contest
+        :param contest_url: The url of the existing contest
         :return: A 200 status code message if updated, otherwise,
         a 404 error if not found.
         """
         # The id of the updater admin
         admin_id = get_jwt_identity()
         try:
-            fetched = self.contest_controller.get(url)
+            self.contest_controller.get(contest_url)
             # The storage process from the banner in the form-data
             # body request
             file: werk.FileStorage = request.files.get("banner", None)
@@ -148,7 +151,7 @@ class BannerUpload(Resource):
                                      error="File type not allowed")
             elif file and self.contest_controller.validate_format(file.content_type):
                 filename = secure_filename("_".join([
-                    url,
+                    contest_url,
                     file.filename
                 ]))
                 file.save(os.path.join(
@@ -167,7 +170,7 @@ class BannerUpload(Resource):
             )
 
             self.contest_controller.update(
-                url=url,
+                url=contest_url,
                 admin_id=admin_id,
                 data={
                     "banner": banner
@@ -178,4 +181,4 @@ class BannerUpload(Resource):
             })
         except ValueError as e:
             return response_with(responses.SERVER_ERROR_404,
-                                 error=e)
+                                 error=str(e))

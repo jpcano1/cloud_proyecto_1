@@ -1,27 +1,24 @@
 from ..utils import db
-from .contest import ContestSchema
-
-# Database and Schema Modeling
-from marshmallow_sqlalchemy import ModelSchema
-from marshmallow import fields
 from pymongo.collection import Collection
+from bson import ObjectId
 
 # Encryption Libraries
 from flask_bcrypt import generate_password_hash, check_password_hash
 
 class AdminModel:
-    admins: Collection = db.db.admins
+    admins: Collection = db.admins
 
     def create(self, value: dict):
         """
         Creates the admin in the database
         :return: The admin created
         """
+        value["contests"] = []
         return self.admins.insert_one(value)
 
     def find_one(self, _id):
         return self.admins.find_one(
-            {"_id": _id}
+            {"_id": ObjectId(_id)}
         )
 
     def find(self):
@@ -30,7 +27,7 @@ class AdminModel:
     def update(self, _id, value: dict):
         return self.admins.update_one(
             {"_id": _id},
-            value
+            {"$set": value}
         )
 
     def find_by_email(self, email):
@@ -67,3 +64,9 @@ class AdminModel:
         :rtype: bool
         """
         return check_password_hash(hash_, password)
+
+    @staticmethod
+    def to_dict(mongo_object: dict):
+        mongo_object.pop("password")
+        mongo_object["_id"] = str(mongo_object["_id"])
+        return mongo_object
