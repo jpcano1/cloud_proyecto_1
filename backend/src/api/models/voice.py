@@ -31,11 +31,10 @@ class VoiceModel:
             "_id": _id
         })
 
-    def update(self, _id, contest_id, value: dict):
+    def update(self, _id, value: dict):
         return self.voices.update_one(
             {
                 "_id": _id,
-                "contest_id": contest_id
             },
             value
         )

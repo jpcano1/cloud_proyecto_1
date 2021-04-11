@@ -126,43 +126,46 @@ class VoiceUpload(Resource):
         :param voice_id: The id of the existing voice
         :return: A 200 status code message
         """
-        fetched = VoiceModel.query.get_or_404(voice_id)
-        # This is the file from the form-data
-        file: werk.FileStorage = request.files.get("audio", None)
-        # If it was submitted, save it
-        if fetched and fetched.raw_audio == "":
-            # Controller stage of the voice file
-            if file and not self.voice_controller(file.content_type):
-                return response_with(responses.INVALID_INPUT_422,
-                                     error="File type not allowed")
-            elif file and self.voice_controller(file.content_type):
-                filename = secure_filename("_".join([
-                    str(fetched.id), fetched.name,
-                    fetched.last_name, file.filename
-                ]))
-                # Saves it in the directory
-                file.save(os.path.join(
-                    "src",
+        try:
+            fetched = self.voice_controller.get(voice_id)
+            file: werk.FileStorage = request.files.get("audio", None)
+            if fetched.get("raw_audio", "") == "":
+                if file and not self.voice_controller.validate_format(file.content_type):
+                    return response_with(responses.INVALID_INPUT_422,
+                                         error="File type not allowed")
+                elif file and self.voice_controller.validate_format(file.content_type):
+                    filename = secure_filename("_".join([
+                        str(fetched.id), fetched.name,
+                        fetched.last_name, file.filename
+                    ]))
+                    # Saves it in the directory
+                    file.save(os.path.join(
+                        "src",
+                        current_app.config["RAW_AUDIOS_FOLDER"],
+                        filename
+                    ))
+                else:
+                    return response_with(responses.MISSING_PARAMETERS_422, value={
+                        "error_message": "There is no file"
+                    })
+
+                raw_audio = os.path.join(
+                    "/src",
                     current_app.config["RAW_AUDIOS_FOLDER"],
                     filename
-                ))
-            else:
-                return response_with(responses.MISSING_PARAMETERS_422, value={
-                    "error_message": "There is no file"
+                )
+                self.voice_controller.update(
+                    _id=voice_id,
+                    value={
+                        "raw_audio": raw_audio
+                    }
+                )
+                return response_with(responses.SUCCESS_200, value={
+                    "message": "Audio Uploaded!"
                 })
-            # To the saved audio, defines the url to find it
-            # the url is defined w.r.t the function defined
-            # in the app.py
-            fetched.raw_audio = os.path.join(
-                "/src",
-                current_app.config["RAW_AUDIOS_FOLDER"],
-                filename
-            )
-            db.session.add(fetched)
-            db.session.commit()
-            return response_with(responses.SUCCESS_200, value={
-                "message": "Audio Uploaded!"
-            })
 
-        return response_with(responses.FORBIDDEN_403,
-                             error="Voice already has audio file or it doesn't exist")
+            return response_with(responses.FORBIDDEN_403,
+                          error="Voice already has audio file")
+        except ValueError as e:
+            return response_with(responses.SERVER_ERROR_404,
+                                 error=e)

@@ -23,6 +23,12 @@ class VoiceController:
     def post(self, value: dict):
         return self.voice_model.create(value)
 
+    def update(self, _id, value):
+        return self.voice_model.update(
+            _id=_id,
+            value=value
+        )
+
     @staticmethod
     def validate_format(format_):
         """
@@ -33,13 +39,3 @@ class VoiceController:
         :rtype: bool
         """
         return format_ in allowed_extensions
-
-    def __call__(self, *args, **kwargs):
-        """
-        This function is called when the VoiceController
-        object is called
-        :param args: The function arguments
-        :param kwargs: The function keyword arguments
-        :return: The result of the validation
-        """
-        return self.validate_format(*args)
