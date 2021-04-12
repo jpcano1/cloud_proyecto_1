@@ -10,11 +10,24 @@ import werkzeug as werk
 # Util Imports
 from ..utils import responses, db, response_with
 
+#os
+import os
+
+#AWS SDK
+import boto3
+
+#Creating connection to s3 Client
+s3 = boto3.client('s3',
+                  aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+                  aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
+                  )
+BUCKET_NAME = os.getenv("BUCKET_NAME")
+
 # Models Imports
 from ..models import ContestModel
 
 from datetime import datetime as dt
-import os
+
 
 from ..controllers import ContestController
 
@@ -154,20 +167,24 @@ class BannerUpload(Resource):
                     contest_url,
                     file.filename
                 ]))
-                file.save(os.path.join(
-                    "src",
-                    current_app.config["BANNERS_FOLDER"],
+                file.save(
                     filename
-                ))
+                )
+
             else:
                 return response_with(responses.INVALID_INPUT_422,
                                      error="There is no file")
+            #Create a url to store in the Bucket
+            key = "src/" +  current_app.config["BANNERS_FOLDER"] + "/" + filename
+
             # Create a url to the image
-            banner = os.path.join(
-                "/src",
-                current_app.config["BANNERS_FOLDER"],
-                filename
-            )
+            banner = "/src/" + current_app.config["BANNERS_FOLDER"] + "/" + filename
+
+            #Upload the file to the bucket
+            s3.upload_file(Bucket = BUCKET_NAME, Key=key, Filename= filename)
+
+            #Delete the file once is uploaded
+            os.remove(filename)
 
             self.contest_controller.update(
                 url=contest_url,

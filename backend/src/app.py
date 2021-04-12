@@ -4,7 +4,7 @@ from src.api.config import (DevelopmentConfig,
                             TestingConfig)
 
 # Flask Configurations
-from flask import send_from_directory, Flask
+from flask import send_from_directory, Flask, redirect
 from flask_bcrypt import Bcrypt
 from flask_restful import Api
 from flask_cors import CORS
@@ -23,6 +23,8 @@ from src.api.worker import init_app
 # OS Configurations
 import os, sys
 import logging
+
+import requests
 
 from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
@@ -66,7 +68,7 @@ def create_app(app_config_):
         :param filename: The filename of the audio
         :return: The url of the saved audio
         """
-        return send_from_directory(app.config["RAW_AUDIOS_FOLDER"], filename)
+        return redirect(os.getenv("CDN_ADDRESS") + "/src/static/raw_audios/" + filename)
 
     @app.route("/src/static/converted_audios/<filename>", methods=["GET"])
     def upload_converted_audio(filename):
@@ -75,7 +77,7 @@ def create_app(app_config_):
         :param filename: The filename of the audio
         :return: The url of the saved audio
         """
-        return send_from_directory(app.config["CONVERTED_AUDIOS_FOLDER"], filename)
+        return redirect(os.getenv("CDN_ADDRESS") + "/src/static/converted_audios/" + filename)
 
     @app.route("/src/static/banners/<filename>", methods=["GET"])
     def upload_banner(filename):
@@ -84,7 +86,7 @@ def create_app(app_config_):
         :param filename: The filename of the banner
         :return: The url of the saved banner
         """
-        return send_from_directory(app.config["BANNERS_FOLDER"], filename)
+        return redirect(os.getenv("CDN_ADDRESS") + "/src/static/banners/" + filename)
 
     # Admin Routes
     api.add_resource(SignUp, "/api/signup")

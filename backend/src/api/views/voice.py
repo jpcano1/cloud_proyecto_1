@@ -11,8 +11,18 @@ from ..utils import response_with, responses
 from werkzeug.utils import secure_filename
 import werkzeug as werk
 
-# OS Imports
+#os
 import os
+
+#AWS SDK
+import boto3
+#Creating connection to s3 Client
+s3 = boto3.client('s3',
+                  aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+                  aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
+                  )
+BUCKET_NAME = os.getenv("BUCKET_NAME")
+
 import pymongo
 
 from ..controllers import VoiceController
@@ -135,11 +145,9 @@ class VoiceUpload(Resource):
                         str(fetched["_id"]), file.filename
                     ]))
                     # Saves it in the directory
-                    file.save(os.path.join(
-                        "src",
-                        current_app.config["RAW_AUDIOS_FOLDER"],
+                    file.save(
                         filename
-                    ))
+                    )
                 else:
                     return response_with(responses.MISSING_PARAMETERS_422, value={
                         "error_message": "There is no file"
@@ -150,6 +158,12 @@ class VoiceUpload(Resource):
                     current_app.config["RAW_AUDIOS_FOLDER"],
                     filename
                 )
+                # Create a url to store in the Bucket
+                key = "src/" + current_app.config["RAW_AUDIOS_FOLDER"] + "/" + filename
+                # Upload the file to the bucket
+                s3.upload_file(Bucket=BUCKET_NAME, Key=key, Filename=filename)
+                # Delete the file once is uploaded
+                os.remove(filename)
                 self.voice_controller.update(
                     _id=voice_id,
                     value={
