@@ -1,14 +1,12 @@
 # Main utils
 flask
-flask-sqlalchemy
-flask-marshmallow
-sqlalchemy
-marshmallow_sqlalchemy
+Flask-PyMongo
+pymongo
+dnspython
+boto3
 
 # Miscellaneous
 python-dotenv
-marshmallow
-marshmallow-enum
 flask-jwt-extended
 Flask-Mail
 werkzeug
@@ -26,6 +24,3 @@ gunicorn
 # Testing libraries
 unittest2
 nose
-Flask-PyMongo
-pymongo
-dnspython
