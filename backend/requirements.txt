@@ -15,7 +15,7 @@ werkzeug
 flask-restful
 flask-bcrypt
 flask-cors
-celery[redis]
+celery[sqs]
 
 # Production libraries
 wheel
