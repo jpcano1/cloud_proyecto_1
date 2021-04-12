@@ -1,10 +1,12 @@
 from celery import current_app
 from ..controllers import VoiceController
-from ..utils import send_email
+from ..utils import send_email, s3
 from flask import render_template
 import time
 import logging
 import os
+from dotenv import  load_dotenv, find_dotenv
+load_dotenv(find_dotenv())
 
 voice_controller = VoiceController()
 
@@ -19,6 +21,9 @@ logger.addHandler(file_handler)
 
 def is_production_environment():
     return current_app.conf.work_env == "PROD"
+
+def get_banner_folder():
+    return current_app.conf.banners_folder
 
 def retrieve():
     """
@@ -54,19 +59,34 @@ def convert(audio_url):
     :param audio_url: The url of the audio to be converted
     :return: The path of the converted voice
     """
-    # Get the full audio url
-    full_path = audio_url[1:]
-    # Get the full audio name
-    audio_name = full_path.split("/")[-1]
-    if audio_name.endswith(".mp3"):
-        converted_path = "src/static/converted_audios/" + audio_name
+    if audio_url.endswith(".mp3"):
+        converted_path = audio_url
     else:
-        converted_path = "src/static/converted_audios/" + audio_name + ".mp3"
+        converted_path = audio_url + ".mp3"
 
     # Method of conversion
     if not os.path.exists(converted_path):
-        os.system(f"ffmpeg -hide_banner -loglevel error -i {full_path} {converted_path}")
-    return "/" + converted_path
+        os.system(f"ffmpeg -hide_banner -loglevel error -i {audio_url} {converted_path}")
+    return converted_path
+
+def download_file(audio_url):
+
+    key = audio_url[1:]
+    filename = audio_url.split("/")[-1]
+    s3.download_file(
+        Bucket=os.getenv("BUCKET_NAME"), Key=key,
+        Filename=filename
+    )
+    converted_path = convert(filename)
+    key = "src/" +  get_banner_folder() + "/" + converted_path
+    s3.upload_file(
+        Bucket=os.getenv("BUCKET_NAME"), Key=key,
+        Filename=converted_path
+    )
+    converted_audio = "/src/" + get_banner_folder() + "/" + converted_path
+    os.remove(filename)
+    os.remove(converted_path)
+    return converted_audio
 
 @current_app.task(name="audio_converter")
 def converter():
@@ -83,7 +103,7 @@ def converter():
         if voice["raw_audio"] != "":
             # Start time
             logger.info(f"{str(voice['_id'])},begin,{time.time()}")
-            path = convert(voice["raw_audio"])
+            path = download_file(voice["raw_audio"])
             # Log message
             logger.info(f"{str(voice['_id'])},end,{time.time()}")
             voice_controller.update(

@@ -24,8 +24,6 @@ from src.api.worker import init_app
 import os, sys
 import logging
 
-import requests
-
 from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 

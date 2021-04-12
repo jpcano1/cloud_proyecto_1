@@ -24,3 +24,4 @@ gunicorn
 # Testing libraries
 unittest2
 nose
+requests

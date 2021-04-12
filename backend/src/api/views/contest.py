@@ -8,26 +8,10 @@ from werkzeug.utils import secure_filename
 import werkzeug as werk
 
 # Util Imports
-from ..utils import responses, db, response_with
+from ..utils import responses, response_with, s3
 
 #os
 import os
-
-#AWS SDK
-import boto3
-
-#Creating connection to s3 Client
-s3 = boto3.client('s3',
-                  aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-                  aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
-                  )
-BUCKET_NAME = os.getenv("BUCKET_NAME")
-
-# Models Imports
-from ..models import ContestModel
-
-from datetime import datetime as dt
-
 
 from ..controllers import ContestController
 
@@ -181,8 +165,7 @@ class BannerUpload(Resource):
             banner = "/src/" + current_app.config["BANNERS_FOLDER"] + "/" + filename
 
             #Upload the file to the bucket
-            s3.upload_file(Bucket = BUCKET_NAME, Key=key, Filename= filename)
-
+            s3.upload_file(Bucket=os.getenv("BUCKET_NAME"), Key=key, Filename=filename)
             #Delete the file once is uploaded
             os.remove(filename)
 

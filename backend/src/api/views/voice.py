@@ -4,8 +4,7 @@ from flask import request, current_app
 from flask_jwt_extended import jwt_required
 
 # Models and Utils Imports
-from ..models import VoiceModel
-from ..utils import response_with, responses
+from ..utils import response_with, responses, s3
 
 # Werkzeug utils
 from werkzeug.utils import secure_filename
@@ -13,15 +12,6 @@ import werkzeug as werk
 
 #os
 import os
-
-#AWS SDK
-import boto3
-#Creating connection to s3 Client
-s3 = boto3.client('s3',
-                  aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-                  aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
-                  )
-BUCKET_NAME = os.getenv("BUCKET_NAME")
 
 import pymongo
 
@@ -161,7 +151,7 @@ class VoiceUpload(Resource):
                 # Create a url to store in the Bucket
                 key = "src/" + current_app.config["RAW_AUDIOS_FOLDER"] + "/" + filename
                 # Upload the file to the bucket
-                s3.upload_file(Bucket=BUCKET_NAME, Key=key, Filename=filename)
+                s3.upload_file(Bucket=os.getenv("BUCKET_NAME"), Key=key, Filename=filename)
                 # Delete the file once is uploaded
                 os.remove(filename)
                 self.voice_controller.update(

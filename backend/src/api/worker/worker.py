@@ -28,6 +28,7 @@ def init_app(app: Flask):
     }
 
     celery_app.conf.work_env = os.getenv("WORK_ENV", "DEV")
+    celery_app.conf.banners_folder = app.config["BANNERS_FOLDER"]
 
     # The task base app
     TaskBase = celery_app.Task
