@@ -11,8 +11,7 @@ class Config(object):
     RAW_AUDIOS_FOLDER = "static/raw_audios"
     LOGS_FOLDER = "static/logs"
     PROPAGATE_EXCEPTIONS = True
-    CELERY_BROKER = os.getenv("REDIS_URL", "redis://localhost:6379/0")
-    CELERY_BACKEND = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+    CELERY_BROKER = os.getenv("SQS_URL")
     CELERY_SCHEDULE_TIME = int(os.getenv("CELERY_SCHEDULE_TIME", 15))
 
 class ProductionConfig(Config):

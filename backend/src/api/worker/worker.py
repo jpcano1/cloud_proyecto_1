@@ -15,8 +15,7 @@ def init_app(app: Flask):
     :rtype: Celery
     """
     celery_app = Celery(app.import_name,
-                        broker=app.config["CELERY_BROKER"],
-                        backend=app.config["CELERY_BACKEND"])
+                        broker=app.config["CELERY_BROKER"])
 
     # The beat scheduler executes the converter
     # each interval defined in the app config
