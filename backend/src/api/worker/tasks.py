@@ -22,8 +22,8 @@ logger.addHandler(file_handler)
 def is_production_environment():
     return current_app.conf.work_env == "PROD"
 
-def get_banner_folder():
-    return current_app.conf.banners_folder
+def get_converted_folder():
+    return current_app.conf.converted_audios
 
 def retrieve():
     """
@@ -78,12 +78,12 @@ def download_file(audio_url):
         Filename=filename
     )
     converted_path = convert(filename)
-    key = "src/" +  get_banner_folder() + "/" + converted_path
+    key = "src/" + get_converted_folder() + "/" + converted_path
     s3.upload_file(
         Bucket=os.getenv("BUCKET_NAME"), Key=key,
         Filename=converted_path
     )
-    converted_audio = "/src/" + get_banner_folder() + "/" + converted_path
+    converted_audio = "/src/" + get_converted_folder() + "/" + converted_path
     os.remove(filename)
     os.remove(converted_path)
     return converted_audio
