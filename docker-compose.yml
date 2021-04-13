@@ -12,6 +12,8 @@ volumes:
       sshcmd: docker-nfs@172.31.45.103:/home/docker-nfs/src
       password: ${USER_PASSWD}
       allow_other: ""
+  code_data:
+    name: "code_data"
 
 services:
   backend: &backend
@@ -25,6 +27,7 @@ services:
       - backend/env/production/postgres
     volumes:
       - voice_data:/app/src/static
+      - code_data:/app/src
     ports:
       - 5000:5000
     expose:

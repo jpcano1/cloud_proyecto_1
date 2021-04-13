@@ -48,9 +48,10 @@ def notify_converted(name, email):
         )
     print("Email Sent!")
 
-def convert(audio_url):
+def convert(audio_id, audio_url):
     """
     This method converts a song from any format to mp3
+    :param audio_id: The id of the audio
     :param audio_url: The url of the audio to be converted
     :return: The path of the converted voice
     """
@@ -65,7 +66,9 @@ def convert(audio_url):
 
     # Method of conversion
     if not os.path.exists(converted_path):
+        logger.info(f"{audio_id},begin,{time.time()}")
         os.system(f"ffmpeg -hide_banner -loglevel error -i {full_path} {converted_path}")
+        logger.info(f"{audio_id},end,{time.time()}")
     return "/" + converted_path
 
 @current_app.task(name="audio_converter")
@@ -81,11 +84,7 @@ def converter():
     counter = 0
     for voice in fetched_voices:
         if voice.raw_audio:
-            # Start time
-            logger.info(f"{voice.id},begin,{time.time()}")
-            path = convert(voice.raw_audio)
-            # Log message
-            logger.info(f"{voice.id},end,{time.time()}")
+            path = convert(voice.id, voice.raw_audio)
             voice.converted = True
             voice.converted_audio = path
             # Update route
