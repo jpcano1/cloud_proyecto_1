@@ -4,7 +4,7 @@ ENV APP_DIR /app
 WORKDIR $APP_DIR
 
 ADD src $APP_DIR/src
-ADD requirements/dev.txt $APP_DIR
+ADD requirements.txt $APP_DIR
 ADD wsgi.py $APP_DIR
 
 # Run Commands
@@ -30,10 +30,12 @@ RUN apt-get update && apt full-upgrade -y && \
         git \
         ffmpeg \
         vim \
+        libcurl4-gnutls-dev \
+        librtmp-dev \
         && \
         apt-get clean && \
         rm -rf /var/lib/apt/lists/*
 
 RUN pip install -q --upgrade pip
-RUN pip install -q -r dev.txt
+RUN pip install -q -r requirements.txt
 RUN pip install -q unittest2
