@@ -33,8 +33,6 @@ services:
     build:
       context: frontend
       dockerfile: compose/production/Dockerfile
-    env_file:
-      - frontend/env/app
     ports:
       - 3000:80
     depends_on:
