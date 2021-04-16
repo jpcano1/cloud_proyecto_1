@@ -99,13 +99,11 @@ def converter():
     emails = []
 
     counter = 0
+    logger.info(f"begin,{time.time()}")
     for voice in fetched_voices:
         if voice["raw_audio"] != "":
             # Start time
-            logger.info(f"{str(voice['_id'])},begin,{time.time()}")
             path = download_file(voice["raw_audio"])
-            # Log message
-            logger.info(f"{str(voice['_id'])},end,{time.time()}")
             voice_controller.update(
                 str(voice['_id']),
                 value={
@@ -117,7 +115,7 @@ def converter():
             print(f"Voice: {str(voice['_id'])} converted")
             emails.append((voice["name"], voice["email"]))
             counter += 1
-
+    logger.info(f"end,{time.time()}")
     for name, email in emails:
         notify_converted(name, email)
     print(f"Voices converted: {counter}")
