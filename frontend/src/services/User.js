@@ -1,13 +1,14 @@
 import axios from "axios";
 import Cookie from "js-cookie";
-import {store} from './MemCached'; 
+
+var memcached = require('./MemCached.js');
 
 const url = process.env.REACT_APP_API_URL + process.env.REACT_APP_PORT + "/api"
 
 export async function post_login(data){
     try{
         let answer = await axios.post(url+"/login",data);
-        await store("access_token",answer.data.access_token);
+        await memcached.store("access_token",answer.data.access_token);
         //Cookie.set("access_token",answer.data.access_token);
         return answer.data.admin_id
     }

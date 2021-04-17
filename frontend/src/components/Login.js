@@ -7,7 +7,7 @@ import '../css/LoginCss.css';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import Cookie from 'js-cookie';
-import {store, getValue} from '../services/MemCached';
+var memcached = require('../services/MemCached.js');
 
 export default function Login(){
     const history = useHistory();
@@ -36,7 +36,7 @@ export default function Login(){
       if(typeof(answer)==='string'){
 
 
-          await store('admin',answer)
+          await memcached.store('admin',answer)
           //Cookie.set('admin', answer);
           history.push({pathname:"/contest"});
       }

@@ -7,7 +7,7 @@ import Pagination from '@material-ui/lab/Pagination';
 import '../css/Contest.css';
 
 import Cookie from 'js-cookie';
-import {getValue} from '../services/MemCached';
+var memcached = require('../services/MemCached.js');
 
 
 
@@ -32,7 +32,7 @@ export default function Contest(props){
     useEffect(async () =>{
         let answer = await get_contest_detail(props.match.params.url)
         //Cookie.get("access_token")
-        if(await getValue('access_token')){
+        if(await memcached.getValue('access_token')){
           setIsLogged(true);
         }
         setContest(answer.contest); 
