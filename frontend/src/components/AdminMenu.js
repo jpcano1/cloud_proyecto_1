@@ -5,7 +5,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import Cookie from 'js-cookie';
 import { useHistory } from "react-router-dom";
-var memcached = require('../services/MemCached.js');
+
 
 
 
@@ -42,10 +42,10 @@ export default function AdminMenu(){
 
      async function fetchContest(){
        //Cookie.get('admin')
-       if(await memcached.getValue('admin')===undefined){
+       if(await Cookie.get('admin')===undefined){
         history.push("/login");
        }
-        let answer = await get_contests_admin(await memcached.getValue('admin'));
+        let answer = await get_contests_admin(await Cookie.get('admin'));
         setContest(answer);
     }
     function handleClose (event, reason){

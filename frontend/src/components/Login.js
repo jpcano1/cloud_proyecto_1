@@ -38,7 +38,7 @@ export default function Login(){
 
 
           await store('admin',answer)
-          //Cookie.set('admin', answer);
+          Cookie.set('admin', answer);
           history.push({pathname:"/contest"});
       }
       else{
