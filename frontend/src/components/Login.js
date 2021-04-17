@@ -7,6 +7,7 @@ import '../css/LoginCss.css';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import Cookie from 'js-cookie';
+import {store, getValue} from './MemCached';
 
 export default function Login(){
     const history = useHistory();
@@ -32,7 +33,10 @@ export default function Login(){
       let data = {"email": email, "password":password}; 
       let answer = await post_login(data);
       if(typeof(answer)==='string'){
-          Cookie.set('admin', answer);
+
+
+          await store('admin',answer)
+          //Cookie.set('admin', answer);
           history.push({pathname:"/contest"});
       }
       else{

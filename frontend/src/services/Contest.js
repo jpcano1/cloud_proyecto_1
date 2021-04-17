@@ -1,8 +1,11 @@
 import axios from "axios";
 import Cookie from 'js-cookie';
+import {getValue} from './MemCached'; 
 
 const url = process.env.REACT_APP_API_URL + process.env.REACT_APP_PORT + "/api/contest"
 const urlBanner = process.env.REACT_APP_API_URL + process.env.REACT_APP_PORT + "/api/banner"
+const access_token = getValue("access_token")
+
 
 export async function get_contest_detail(id){
     let answer = await axios.get(url+"/"+id); 
@@ -11,14 +14,14 @@ export async function get_contest_detail(id){
 
 export async function upload_banner(id, data){
     axios.defaults.headers.common['Authorization'] = 
-    'Bearer ' + Cookie.get("access_token");
+    'Bearer ' + access_token;
     let answer = await axios.post(urlBanner+"/"+id,data); 
     return answer.data; 
 }
 
 export async function post_contest(data){
     axios.defaults.headers.common['Authorization'] = 
-    'Bearer ' + Cookie.get("access_token");
+    'Bearer ' + access_token;
     let answer = await axios.post(url,data); 
     console.log(answer)
     return answer.data; 
@@ -27,14 +30,14 @@ export async function post_contest(data){
 
 export async function delete_contest(data){
     axios.defaults.headers.common['Authorization'] = 
-    'Bearer ' + Cookie.get("access_token");
+    'Bearer ' + access_token;
     let answer = await axios.delete(url+"/"+data); 
     return answer.data; 
 }
 
 export async function put_contest(data){
     axios.defaults.headers.common['Authorization'] = 
-    'Bearer ' + Cookie.get("access_token");
+    'Bearer ' + access_token;
     let urltemp = url+"/"+data.url; 
     let answer = await axios.put(urltemp, data);
     return answer.data; 
