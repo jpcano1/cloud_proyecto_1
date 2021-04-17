@@ -3,7 +3,6 @@ var memcached = new Memcached('cloudmemcache.6b8rab.0001.use1.cache.amazonaws.co
 
 
 const TIME = 7200
-
 async function store(key,value){
     try{
         await memcached.set(key,value,TIME)
@@ -21,6 +20,5 @@ async function getValue(key){
         console.log("Ocurrio un error:", error)
     }
 }
-module.exports = {store,getValue}
 
 
