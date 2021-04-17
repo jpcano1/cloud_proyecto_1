@@ -5,7 +5,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import Cookie from 'js-cookie';
 import { useHistory } from "react-router-dom";
-import {getValue} from './MemCached';
+import {getValue} from '../services/MemCached';
 
 
 export default function AdminMenu(){

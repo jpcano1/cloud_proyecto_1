@@ -7,7 +7,7 @@ import '../css/LoginCss.css';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import Cookie from 'js-cookie';
-import {store, getValue} from './MemCached';
+import {store, getValue} from '../services/MemCached';
 
 export default function Login(){
     const history = useHistory();

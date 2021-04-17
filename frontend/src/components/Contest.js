@@ -7,7 +7,7 @@ import Pagination from '@material-ui/lab/Pagination';
 import '../css/Contest.css';
 
 import Cookie from 'js-cookie';
-import {getValue} from './MemCached';
+import {getValue} from '../services/MemCached';
 
 
 
