@@ -7,9 +7,6 @@ import '../css/LoginCss.css';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import Cookie from 'js-cookie';
-var Memcached = require('memcached-promise'); 
-var memcached = new Memcached('cloudmemcache.6b8rab.0001.use1.cache.amazonaws.com:11211');
-const TIME = 7200
 
 export default function Login(){
     const history = useHistory();
@@ -35,9 +32,6 @@ export default function Login(){
       let data = {"email": email, "password":password}; 
       let answer = await post_login(data);
       if(typeof(answer)==='string'){
-
-
-          await store('admin',answer)
           Cookie.set('admin', answer);
           history.push({pathname:"/contest"});
       }
@@ -47,23 +41,6 @@ export default function Login(){
       }
       
     }
-  async function store(key,value){
-      try{
-          await memcached.set(key,value,TIME)
-      }
-      catch(error){
-          console.log("Ocurrio un error: ", error)
-      }
-      
-  }
-  async function getValue(key){
-      try{
-          return await memcached.get(key);
-      }
-      catch(error){
-          console.log("Ocurrio un error:", error)
-      }
-  }
     return(
         <div className="Login justify-content-center center  col-4">
         <Form onSubmit={handleSubmit}>
