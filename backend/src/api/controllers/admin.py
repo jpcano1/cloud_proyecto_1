@@ -33,7 +33,6 @@ class AdminController:
             identity=str(fetched_admin["_id"]),
             expires_delta=expires
         )
-        redis_app.set(fetched_admin["_id"],self.admin_model.to_dict(fetched_admin),7200)
         return {
             "admin_id": str(fetched_admin["_id"]),
             "access_token": access_token
