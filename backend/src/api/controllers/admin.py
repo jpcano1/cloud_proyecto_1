@@ -3,6 +3,7 @@ from datetime import timedelta
 from flask_jwt_extended import create_access_token
 from ..utils import redis_app
 
+
 class AdminController:
     def __init__(self):
         self.admin_model = AdminModel()
@@ -38,13 +39,12 @@ class AdminController:
             "access_token": access_token
         }
 
-
     def get(self, _id):
         if redis_app.get(_id):
             return redis_app.get(_id)
         fetched_admin = self.admin_model.find_one(_id)
         if fetched_admin:
-            redis_app.set(fetched_admin["_id"],self.admin_model.to_dict(fetched_admin),7200)
+            redis_app.set(fetched_admin["_id"], self.admin_model.to_dict(fetched_admin), 7200)
         if not fetched_admin:
             raise ValueError("User not found")
         return self.admin_model.to_dict(fetched_admin)
