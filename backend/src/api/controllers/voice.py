@@ -1,5 +1,5 @@
 from ..models import VoiceModel, ContestModel
-from bson import ObjectId
+
 
 allowed_extensions = {
     "audio/ogg", "audio/wave",
@@ -13,8 +13,8 @@ class VoiceController:
         self.voice_model = VoiceModel()
         self.contest_model = ContestModel()
 
-    def get(self, _id):
-        result =  self.voice_model.find_one(_id)
+    def get(self, id):
+        result =  self.voice_model.find_one(id)
         if not result:
             raise ValueError("Resource not found")
         return self.voice_model.to_dict(result)
@@ -31,18 +31,22 @@ class VoiceController:
             raise ValueError("Contest doesn't exist")
         return self.voice_model.create(value)
 
-    def update(self, _id, value):
-        result = self.voice_model.update(
-            _id=_id,
+    def update(self, id, value):
+        result =  self.voice_model.find_one(id)
+        if not result:
+            raise ValueError("Resource not found")
+        self.voice_model.update(
+            id=id,
             value=value
         )
-        if result.matched_count < 1:
-            raise ValueError("Resource does not exist")
 
-    def delete(self, _id):
-        result = self.voice_model.delete(_id)
-        if result.deleted_count < 1:
-            raise ValueError("Resource does not exist")
+
+    def delete(self, id):
+        result =  self.voice_model.find_one(id)
+        if not result:
+            raise ValueError("Resource not found")
+        self.voice_model.delete(id)
+
 
     @staticmethod
     def validate_format(format_):

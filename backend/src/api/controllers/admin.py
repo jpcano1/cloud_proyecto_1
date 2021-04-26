@@ -29,17 +29,17 @@ class AdminController:
 
         expires = timedelta(hours=4)
         access_token = create_access_token(
-            identity=str(fetched_admin["_id"]),
+            identity=str(fetched_admin["email"]),
             expires_delta=expires
         )
         return {
-            "admin_id": str(fetched_admin["_id"]),
+            "admin_id": str(fetched_admin["email"]),
             "access_token": access_token
         }
 
 
-    def get(self, _id):
-        fetched_admin = self.admin_model.find_one(_id)
+    def get(self, email):
+        fetched_admin = self.admin_model.find_one(email)
         if not fetched_admin:
             raise ValueError("User not found")
         return self.admin_model.to_dict(fetched_admin)

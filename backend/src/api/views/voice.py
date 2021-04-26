@@ -10,12 +10,13 @@ from ..utils import response_with, responses, s3
 from werkzeug.utils import secure_filename
 import werkzeug as werk
 
-#os
+# os
 import os
 
 import pymongo
 
 from ..controllers import VoiceController
+
 
 class Voice(Resource):
     voice_controller = VoiceController()
@@ -66,8 +67,9 @@ class Voice(Resource):
         result = self.voice_controller.post(data)
         return response_with(responses.SUCCESS_200, value={
             "message": "Voice uploaded!",
-            "voice": str(result.inserted_id)
+            "voice": str(result["id"])
         })
+
 
 class VoiceDetail(Resource):
     voice_controller = VoiceController()
@@ -114,6 +116,7 @@ class VoiceDetail(Resource):
                                  error=str(e))
         return response_with(responses.SUCCESS_204)
 
+
 class VoiceUpload(Resource):
     voice_controller = VoiceController()
 
@@ -124,15 +127,15 @@ class VoiceUpload(Resource):
         :return: A 200 status code message
         """
         try:
-            fetched = self.voice_controller.get(voice_id)
+            fetched: dict = self.voice_controller.get(voice_id)
             file: werk.FileStorage = request.files.get("audio", None)
-            if fetched.get("raw_audio", "") == "":
+            if fetched["raw_audio"] == "":
                 if file and not self.voice_controller.validate_format(file.content_type):
                     return response_with(responses.INVALID_INPUT_422,
                                          error="File type not allowed")
                 elif file and self.voice_controller.validate_format(file.content_type):
                     filename = secure_filename("_".join([
-                        str(fetched["_id"]), file.filename
+                        str(fetched["id"]), file.filename
                     ]))
                     # Saves it in the directory
                     file.save(
@@ -155,7 +158,7 @@ class VoiceUpload(Resource):
                 # Delete the file once is uploaded
                 os.remove(filename)
                 self.voice_controller.update(
-                    _id=voice_id,
+                    id=voice_id,
                     value={
                         "raw_audio": raw_audio
                     }
@@ -165,7 +168,7 @@ class VoiceUpload(Resource):
                 })
 
             return response_with(responses.FORBIDDEN_403,
-                          error="Voice already has audio file")
+                                 error="Voice already has audio file")
         except ValueError as e:
             return response_with(responses.SERVER_ERROR_404,
                                  error=str(e))

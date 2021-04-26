@@ -102,19 +102,19 @@ def converter():
     for voice in fetched_voices:
         if voice["raw_audio"] != "":
             # Start time
-            logger.info(f"{str(voice['_id'])},begin,{time.time()}")
+            logger.info(f"{str(voice['id'])},begin,{time.time()}")
             path = download_file(voice["raw_audio"])
             # Log message
-            logger.info(f"{str(voice['_id'])},end,{time.time()}")
+            logger.info(f"{str(voice['id'])},end,{time.time()}")
             voice_controller.update(
-                str(voice['_id']),
+                str(voice['id']),
                 value={
                     "converted": True,
                     "converted_audio": path
                 }
             )
             # Update route
-            print(f"Voice: {str(voice['_id'])} converted")
+            print(f"Voice: {str(voice['id'])} converted")
             emails.append((voice["name"], voice["email"]))
             counter += 1
 

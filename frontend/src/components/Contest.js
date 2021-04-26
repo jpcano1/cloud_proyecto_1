@@ -35,7 +35,7 @@ export default function Contest(props){
         }
         setContest(answer.contest); 
         fetchAudios();
-    },[contest._id])
+    },[contest.url])
 
     function validateForm(){
         return email.length > 0 && name.length > 0 & lastName.length > 0 && voice
@@ -44,7 +44,7 @@ export default function Contest(props){
          fetchAudios(value);
     }
     async function fetchAudios(page=1){
-      let answer = await get_voices(contest._id,page); 
+      let answer = await get_voices(contest.url,page); 
       if(!isLogged){
         console.log(answer);
         setAudios(answer.voices.filter((d) => d.converted));
