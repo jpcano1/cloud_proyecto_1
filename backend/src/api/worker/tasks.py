@@ -99,7 +99,7 @@ def converter():
     emails = []
 
     counter = 0
-    for voice in fetched_voices:
+    for voice in fetched_voices["Items"]:
         if voice["raw_audio"] != "":
             # Start time
             logger.info(f"{str(voice['id'])},begin,{time.time()}")

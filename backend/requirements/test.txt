@@ -1,4 +1,0 @@
--r dev.txt
-
-unittest2
-nose
