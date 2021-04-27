@@ -12,10 +12,12 @@ RUN npm install --silent
 
 RUN npm run build
 
-FROM nginx:1.16.0-alpine
+FROM nginx:1.17-alpine
+RUN apk --no-cache add curl
+RUN curl -L https://github.com/a8m/envsubst/releases/download/v1.1.0/envsubst-`uname -s`-`uname -m` -o envsubst && \
+    chmod +x envsubst && \
+    mv envsubst /usr/local/bin
+ADD nginx/nginx.conf /etc/nginx/nginx.template
 COPY --from=build /app/build /usr/share/nginx/html
 
-RUN rm /etc/nginx/conf.d/default.conf
-COPY nginx/nginx.conf /etc/nginx/conf.d
-
-CMD ["nginx","-g","daemon off;"]
+CMD ["/bin/sh", "-c", "envsubst < /etc/nginx/nginx.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
