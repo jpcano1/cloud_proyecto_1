@@ -27,6 +27,7 @@ def init_app(app: Flask):
     }
 
     celery_app.conf.work_env = os.getenv("WORK_ENV", "DEV")
+    celery_app.conf.snitch_url = os.getenv("SNITCH_URL")
     celery_app.conf.converted_audios = app.config["CONVERTED_AUDIOS_FOLDER"]
 
     # The task base app
