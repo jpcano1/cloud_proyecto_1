@@ -2,7 +2,7 @@ from flask_restful import Resource
 from flask import request
 from ..utils import responses, response_with
 from ..controllers import AdminController
-from bson.json_util import dumps
+
 
 class SignUp(Resource):
     admin_controller = AdminController()
@@ -36,7 +36,7 @@ class SignUp(Resource):
             return response_with(responses.INVALID_INPUT_422, error=str(e))
         return response_with(responses.SUCCESS_201, value={
             "message": "Admin created",
-            "_id": str(result.inserted_id)
+            "id": data["email"]
         })
 
 class Login(Resource):
@@ -76,6 +76,7 @@ class Admin(Resource):
     def get(self):
         """
         Retrieves all the admins of the database
+        Retrieves all the admins of the database
         (will be deleted)
         :return: All the admins in the database
         """
@@ -87,14 +88,14 @@ class Admin(Resource):
 class AdminDetail(Resource):
     admin_controller = AdminController()
 
-    def get(self, admin_id):
+    def get(self, email):
         """
         Retrieves the list of admins
         :param admin_id: The id of the admin to retrieve
         :return: The admin retrieved
         """
         try:
-            fetched_admin = self.admin_controller.get(admin_id)
+            fetched_admin = self.admin_controller.get(email)
         except ValueError as e:
             return response_with(responses.SERVER_ERROR_404,
                                  error=str(e))

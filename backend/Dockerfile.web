@@ -6,19 +6,7 @@ WORKDIR $APP_DIR
 ADD src $APP_DIR/src
 ADD requirements.txt $APP_DIR
 ADD wsgi.py $APP_DIR
-
-# Run Commands
-ADD compose/development/app/start $APP_DIR
-RUN sed -i 's/\r//' $APP_DIR/start
-RUN chmod +x $APP_DIR/start
-
-ADD compose/development/celery/worker/start $APP_DIR/celery_worker_start
-RUN sed -i 's/\r//' $APP_DIR/celery_worker_start
-RUN chmod +x $APP_DIR/celery_worker_start
-
-ADD compose/development/celery/beat/start $APP_DIR/celery_beat_start
-RUN sed -i 's/\r//' $APP_DIR/celery_beat_start
-RUN chmod +x $APP_DIR/celery_beat_start
+ADD .env $APP_DIR
 
 ENV PYTHONUNBUFFERED 1
 ENV LANG C.UTF-8
@@ -38,4 +26,5 @@ RUN apt-get update && apt full-upgrade -y && \
 
 RUN pip install -q --upgrade pip
 RUN pip install -q -r requirements.txt
-RUN pip install -q unittest2
+
+CMD gunicorn --bind 0.0.0.0:$PORT wsgi:app

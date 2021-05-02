@@ -11,11 +11,11 @@ class ContestController:
         contest = self.contest_model.find_one(url)
         if not contest:
             raise ValueError("Resource does not exist")
-        return self.contest_model.to_dict(contest)
+        return contest
 
-    def list(self, admin_id):
-        result = self.contest_model.find(admin_id)
-        return [self.contest_model.to_dict(x) for x in result]
+    def list(self, email):
+        result = self.contest_model.find(email)
+        return result
 
     def post(self, value):
         fetched = self.contest_model.find_one(value["url"])
@@ -23,15 +23,20 @@ class ContestController:
             raise ValueError("Invalid url")
         return self.contest_model.create(value)
 
-    def update(self, url, admin_id, data):
-        result = self.contest_model.update(url, admin_id, data)
-        if result.matched_count < 1:
+    def update(self, url, data):
+        fetched = self.contest_model.find_one(url)
+        if fetched is None:
             raise ValueError("Resource does not exist")
+        self.contest_model.update(url, data)
 
-    def delete(self, url, admin_id):
-        result = self.contest_model.delete(url, admin_id)
-        if result.deleted_count < 1:
+
+
+    def delete(self, url):
+        fetched = self.contest_model.find_one(url)
+        if fetched is None:
             raise ValueError("Resource does not exist")
+        self.contest_model.delete(url)
+
 
     @staticmethod
     def validate_format(format_):

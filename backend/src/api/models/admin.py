@@ -1,12 +1,11 @@
 from ..utils import db
-from pymongo.collection import Collection
-from bson import ObjectId
 
 # Encryption Libraries
 from flask_bcrypt import generate_password_hash, check_password_hash
 
+
 class AdminModel:
-    admins: Collection = db.admins
+    admins = db.Table('admins')
 
     def create(self, value: dict):
         """
@@ -14,20 +13,34 @@ class AdminModel:
         :return: The admin created
         """
         value["contests"] = []
-        return self.admins.insert_one(value)
+        self.admins.put_item(Item=value)
+        return value
 
-    def find_one(self, _id):
-        return self.admins.find_one(
-            {"_id": ObjectId(_id)}
-        )
+    def find_one(self, email):
+        response = self.admins.get_item(Key={
+            "email": email
+        })
+
+        try:
+            return response['Item']
+        except:
+            return None
 
     def find(self):
-        return self.admins.find({})
+        return self.admins.scan()['Items']
 
-    def update(self, _id, value: dict):
-        return self.admins.update_one(
-            {"_id": _id},
-            {"$set": value}
+    def update(self, email, value: dict):
+        update_expression = 'SET {}'.format(','.join(f'#{k}=:{k}' for k in value))
+        expression_attribute_values = {f':{k}': v for k, v in value.items()}
+        expression_attribute_names = {f'#{k}': k for k in value}
+        return self.admins.update_item(
+            Key={
+                "email": email
+            },
+            UpdateExpression=update_expression,
+            ExpressionAttributeValues=expression_attribute_values,
+            ExpressionAttributeNames=expression_attribute_names,
+            ReturnValues='UPDATED_NEW',
         )
 
     def find_by_email(self, email):
@@ -38,9 +51,14 @@ class AdminModel:
         authenticated
         :return: The user found, else None
         """
-        return self.admins.find_one({
+        response = self.admins.get_item(Key={
             "email": email
         })
+
+        try:
+            return response['Item']
+        except:
+            return None
 
     @staticmethod
     def generate_hash(password):
@@ -66,7 +84,6 @@ class AdminModel:
         return check_password_hash(hash_, password)
 
     @staticmethod
-    def to_dict(mongo_object: dict):
-        mongo_object.pop("password")
-        mongo_object["_id"] = str(mongo_object["_id"])
-        return mongo_object
+    def to_dict(admin: dict):
+        admin.pop("password")
+        return admin

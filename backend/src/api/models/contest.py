@@ -1,8 +1,9 @@
 from ..utils import db
-from pymongo.collection import Collection
-
+from boto3.dynamodb.conditions import Key, Attr
+from decimal import Decimal
+import simplejson as json
 class ContestModel:
-    contests: Collection = db.contests
+    contests = db.Table('contests')
 
     def create(self, value: dict):
         """
@@ -11,41 +12,45 @@ class ContestModel:
         """
         value["banner"] = ""
         value["voices"] = []
-        return self.contests.insert_one(value)
+        return self.contests.put_item(Item=value)
 
-    def find(self, admin_id):
-        if admin_id:
-            return self.contests.find({
-                "admin_id": admin_id
-            })
-        return self.contests.find({})
+    def find(self, email):
+        if email:
+            return self.contests.scan(
+                FilterExpression=Attr('admin_id').eq(email)
+            )['Items']
+        return self.contests.scan()['Items']
 
     def find_one(self, url):
-        return self.contests.find_one({
-            "url": url,
+        response = self.contests.get_item(Key={
+            "url": url
         })
+        try:
+            return response['Item']
+        except:
+            return None
 
-    def update(self, url, admin_id, value):
-        return self.contests.update_one(
-            {
-                "admin_id": admin_id,
-                "url": url
+    def update(self, url, value):
+        update_expression = 'SET {}'.format(','.join(f'#{k}=:{k}' for k in value))
+        expression_attribute_values = {f':{k}': v for k, v in value.items()}
+        expression_attribute_names = {f'#{k}': k for k in value}
+        return self.contests.update_item(
+            Key={
+                "url":url
             },
-            {
-                "$set": value
-            }
+            UpdateExpression=update_expression,
+            ExpressionAttributeValues=expression_attribute_values,
+            ExpressionAttributeNames=expression_attribute_names,
+            ReturnValues='UPDATED_NEW',
         )
 
-    def delete(self, url, admin_id):
-        return self.contests.delete_one(
-            {
-                "admin_id": admin_id,
-                "url": url
+    def delete(self, url):
+        return self.contests.delete_item(
+            Key={
+                "url":url
             }
         )
-
     @staticmethod
-    def to_dict(mongo_object):
-        mongo_object["_id"] = str(mongo_object["_id"])
-        return mongo_object
+    def to_dict(contest):
+        return contest
 

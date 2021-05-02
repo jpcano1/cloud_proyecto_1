@@ -1,7 +1,0 @@
--r dev.txt
-
-wheel
-gunicorn
-psycopg2
-psycopg2-binary
-Flask-Mail

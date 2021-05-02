@@ -36,10 +36,10 @@ export async function delete_contest(data){
     return answer.data; 
 }
 
-export async function put_contest(data){
+export async function put_contest(data,urlContest){
     axios.defaults.headers.common['Authorization'] = 
-    'Bearer ' + await Cookie.get("access_token");
-    let urltemp = url+"/"+data.url; 
+    'Bearer ' + Cookie.get("access_token");
+    let urltemp = url+"/"+urlContest; 
     let answer = await axios.put(urltemp, data);
     return answer.data; 
 }

@@ -5,6 +5,8 @@ from flask import render_template
 import time
 import logging
 import os
+import requests
+
 from dotenv import  load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 
@@ -70,7 +72,6 @@ def convert(audio_url):
     return converted_path
 
 def download_file(audio_url):
-
     key = audio_url[1:]
     filename = audio_url.split("/")[-1]
     s3.download_file(
@@ -99,23 +100,36 @@ def converter():
     emails = []
 
     counter = 0
-    logger.info(f"begin,{time.time()}")
-    for voice in fetched_voices:
-        if voice["raw_audio"] != "":
-            # Start time
-            path = download_file(voice["raw_audio"])
-            voice_controller.update(
-                str(voice['_id']),
-                value={
-                    "converted": True,
-                    "converted_audio": path
-                }
-            )
-            # Update route
-            print(f"Voice: {str(voice['_id'])} converted")
-            emails.append((voice["name"], voice["email"]))
-            counter += 1
-    logger.info(f"end,{time.time()}")
-    for name, email in emails:
-        notify_converted(name, email)
+    init_time = time.time()
+
+    if len(fetched_voices["Items"]) > 0:
+        logger.info(f"begin,{init_time}")
+
+        for voice in fetched_voices["Items"]:
+            if voice["raw_audio"] != "":
+                # Start time
+                path = download_file(voice["raw_audio"])
+                # Log message
+                voice_controller.update(
+                    str(voice['id']),
+                    value={
+                        "converted": True,
+                        "converted_audio": path
+                    }
+                )
+                # Update route
+                print(f"Voice: {str(voice['id'])} converted")
+                emails.append((voice["name"], voice["email"]))
+                counter += 1
+        end_time = time.time()
+        logger.info(f"end,{end_time}")
+
+        requests.post(
+            current_app.conf.snitch_url, 
+            data={
+                "conversion_time": f"Conversion finished in {end_time - init_time}"
+            }
+        )
+        for name, email in emails:
+            notify_converted(name, email)
     print(f"Voices converted: {counter}")

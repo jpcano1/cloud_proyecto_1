@@ -63,7 +63,7 @@ export default function AdminMenu(){
         newContest.url = url; 
         newContest.begin_date = begin_date.getDate() + "/"+ begin_date.getMonth() + "/"+ begin_date.getFullYear();
         newContest.end_date = end_date.getDate() + "/"+ end_date.getMonth() + "/"+ end_date.getFullYear();
-        newContest.prize = prize; 
+        newContest.prize = prize.toString(); 
         newContest.script = script; 
         newContest.recommendations = recommendations;
 
@@ -101,8 +101,6 @@ export default function AdminMenu(){
       if(name){
         newContest.name = name;  
       }
-       
-        newContest.url = contestSelected.url;
 
       if(dateChange){
         newContest.begin_date = begin_date.getDate() + "/"+ begin_date.getMonth() + "/"+ begin_date.getFullYear();
@@ -112,7 +110,7 @@ export default function AdminMenu(){
         await fileUpload(contestSelected.url);
       }
       if(prize){
-        newContest.prize = prize; 
+        newContest.prize = prize.toString(); 
       }
       if(script){
         newContest.script = script;
@@ -122,7 +120,7 @@ export default function AdminMenu(){
 
       }
       try{
-          await put_contest(newContest); 
+          await put_contest(newContest,contestSelected.url); 
           setShowEditModal(false);
           fetchContest();
       }

@@ -51,10 +51,10 @@ class Contest(Resource):
         data["admin_id"] = get_jwt_identity()
 
         try:
-            contest_created = self.contest_controller.post(data)
+            self.contest_controller.post(data)
             return response_with(responses.SUCCESS_200, value={
                 "message": "Contest created",
-                "contest": str(contest_created.inserted_id)
+                "contest": data["url"]
             })
         except ValueError as e:
             return response_with(responses.INVALID_FIELD_NAME_SENT_422,
@@ -87,13 +87,10 @@ class ContestDetail(Resource):
         :return: A 200 status code answer if updated, otherwise
         a 404 error if not found
         """
-        # Identity of the updater admin
-        admin_id = get_jwt_identity()
         data = request.get_json()
         try:
             self.contest_controller.update(
                 url=url,
-                admin_id=admin_id,
                 data=data
             )
         except ValueError as e:
@@ -111,12 +108,9 @@ class ContestDetail(Resource):
         :return: A 204 status code message if deleted, otherwise
         a 404 status code response if not found
         """
-        # The identity of the deleter admin
-        admin_id = get_jwt_identity()
         try:
             self.contest_controller.delete(
-                url=url,
-                admin_id=admin_id
+                url=url
             )
         except ValueError as e:
             return response_with(responses.SERVER_ERROR_404,
@@ -134,8 +128,6 @@ class BannerUpload(Resource):
         :return: A 200 status code message if updated, otherwise,
         a 404 error if not found.
         """
-        # The id of the updater admin
-        admin_id = get_jwt_identity()
         try:
             self.contest_controller.get(contest_url)
             # The storage process from the banner in the form-data
@@ -171,7 +163,6 @@ class BannerUpload(Resource):
 
             self.contest_controller.update(
                 url=contest_url,
-                admin_id=admin_id,
                 data={
                     "banner": banner
                 }
