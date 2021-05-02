@@ -66,7 +66,7 @@ class Voice(Resource):
         data = request.get_json()
         result = self.voice_controller.post(data)
         if redis_app.get("voices"):
-            redis_app.set("voices", redis_app.get("voices")+1)
+            redis_app.append("voices",1)
         else:
             redis_app.set("voices",1)
         return response_with(responses.SUCCESS_200, value={
