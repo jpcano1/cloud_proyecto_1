@@ -2,6 +2,8 @@ from ..models import AdminModel
 from datetime import timedelta
 from flask_jwt_extended import create_access_token
 
+
+
 class AdminController:
     def __init__(self):
         self.admin_model = AdminModel()
@@ -36,8 +38,6 @@ class AdminController:
             "admin_id": str(fetched_admin["email"]),
             "access_token": access_token
         }
-
-
     def get(self, email):
         fetched_admin = self.admin_model.find_one(email)
         if not fetched_admin:

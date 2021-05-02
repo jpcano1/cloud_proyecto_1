@@ -4,7 +4,7 @@ from flask import request, current_app
 from flask_jwt_extended import jwt_required
 
 # Models and Utils Imports
-from ..utils import response_with, responses, s3
+from ..utils import response_with, responses, s3, redis_app
 
 # Werkzeug utils
 from werkzeug.utils import secure_filename
@@ -65,6 +65,10 @@ class Voice(Resource):
         """
         data = request.get_json()
         result = self.voice_controller.post(data)
+        if redis_app.get("voices"):
+            redis_app.append("voices",1)
+        else:
+            redis_app.set("voices",1)
         return response_with(responses.SUCCESS_200, value={
             "message": "Voice uploaded!",
             "voice": str(result["id"])

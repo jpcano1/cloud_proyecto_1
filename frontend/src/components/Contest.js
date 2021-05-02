@@ -8,8 +8,6 @@ import '../css/Contest.css';
 
 import Cookie from 'js-cookie';
 
-
-
 export default function Contest(props){
     const[contest, setContest] = useState([]);
 
@@ -30,7 +28,8 @@ export default function Contest(props){
 
     useEffect(async () =>{
         let answer = await get_contest_detail(props.match.params.url)
-        if(Cookie.get("access_token")){
+        //Cookie.get("access_token")
+        if(await Cookie.get("access_token")){
           setIsLogged(true);
         }
         setContest(answer.contest); 
@@ -44,7 +43,7 @@ export default function Contest(props){
          fetchAudios(value);
     }
     async function fetchAudios(page=1){
-      let answer = await get_voices(contest.url,page); 
+      let answer = await get_voices(contest.contest_url,page); 
       if(!isLogged){
         console.log(answer);
         setAudios(answer.voices.filter((d) => d.converted));

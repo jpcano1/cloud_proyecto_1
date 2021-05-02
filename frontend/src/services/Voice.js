@@ -10,7 +10,7 @@ export async function get_voice_detail(id){
     return answer.data; 
 }
 export async function get_voices(id,page=1){
-    let answer = await axios.get(url,{ params: { contest_id: id, page: page }}); 
+    let answer = await axios.get(url,{ params: { contest_url: id, page: page }}); 
     return answer.data; 
 }
 export async function post_voice(data){

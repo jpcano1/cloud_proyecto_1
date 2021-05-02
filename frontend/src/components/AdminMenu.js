@@ -7,6 +7,8 @@ import Cookie from 'js-cookie';
 import { useHistory } from "react-router-dom";
 
 
+
+
 export default function AdminMenu(){
     //URL for request banners
     const urlBanner = process.env.REACT_APP_API_URL+ process.env.REACT_APP_PORT;
@@ -39,10 +41,11 @@ export default function AdminMenu(){
     },[contests.length])
 
      async function fetchContest(){
-       if(Cookie.get('admin')===undefined){
+       //Cookie.get('admin')
+       if(await Cookie.get('admin')===undefined){
         history.push("/login");
        }
-        let answer = await get_contests_admin(Cookie.get('admin'));
+        let answer = await get_contests_admin(await Cookie.get('admin'));
         setContest(answer);
     }
     function handleClose (event, reason){
