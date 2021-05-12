@@ -24,7 +24,7 @@ class VoiceModel:
     def find(self, contest_url):
         if contest_url:
             result = self.voices.scan(
-                 FilterExpression=Attr('contest_url').eq(contest_url)
+                 FilterExpression=Attr('url').eq(contest_url)
             )
         else:
             result = self.voices.scan()['Items']
