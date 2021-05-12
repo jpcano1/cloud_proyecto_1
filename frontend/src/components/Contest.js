@@ -43,7 +43,7 @@ export default function Contest(props){
          fetchAudios(value);
     }
     async function fetchAudios(page=1){
-      let answer = await get_voices(contest.contest_url,page); 
+      let answer = await get_voices(contest.url,page); 
       if(!isLogged){
         console.log(answer);
         setAudios(answer.voices.filter((d) => d.converted));
